@@ -7,7 +7,14 @@ A library to use daybed easily.
 Here is an example of how to use daybed in the context of a list of books you
 would like to read.
 
-    var session = new DaybedSession(hawkSession=hawkSession)
+First you need to create a session:
+
+    var session = new DaybedSession({
+      hawkSession: hawkSession,
+      url: 'http://daybed.spiral-project.org'
+    })
+
+And then create your model (and use it):
 
     var books = new Model({
       title: 'book',
@@ -44,6 +51,5 @@ would like to read.
 In case you know that the server already has a model defined for your books,
 you can just reuse it without having to define it in your code:
 
-    var session = new DaybedSession(hawkSession=hawkSession)
-    var books = new RemoteModel('https://daybed.spiral-project.org/models/books', session);
+    var books = new RemoteModel('books', session);
     books.all()
