@@ -119,6 +119,27 @@ var TIMEOUT = 15000;
     }
   };
 
+
+  function Model(name, definition, session, records) {
+    this.name = name;
+    this.definition = definition;
+    this.records = records || [];
+    this.session = session;
+  }
+
+  Model.prototype = {
+    add: function(record) {
+      this.records.push(record);
+    },
+    save: function(cb) {
+      this.session.add_model(this.name, this.definition, this.records, cb);
+    },
+    delete: function(cb) {
+      this.session.delete_model(this.name, cb);
+    }
+  };
+
   exports.getToken = getToken;
   exports.DaybedSession = DaybedSession;
+  exports.Model = Model;
 })(this);

@@ -9,7 +9,8 @@
           function runTests(done) {
             testHello(function(err, resp) {
               done(resp);
-              testModel(done);
+              testModelApi(done);
+              testModelSessionApi(done);
             });
           }
         </script>
