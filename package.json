@@ -1,0 +1,11 @@
+{
+  "name": "daybed.js",
+  "description": "Daybed Javascript Developer Toolkit",
+  "version": "0.1.0-dev",
+  "author": "Mozilla (https://mozilla.org/)",
+  "homepage": "https://github.com/spiral-project/daybed.js/",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:spiral-project/daybed.js.git"
+  }
+}
