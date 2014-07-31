@@ -7,12 +7,12 @@
 // Write some tests
 var host = "http://localhost:8000";
 
-// Test getToken and hello
+// Test Daybed.getToken and hello
 function testHello(done) {
-  getToken(host, hello);
+  Daybed.getToken(host, hello);
 
   function hello(err, resp) {
-    var session = new Session(host, resp.credentials);
+    var session = new Daybed.Session(host, resp.credentials);
     session.hello(done);
   }
 }
@@ -21,11 +21,11 @@ function testHello(done) {
 function testModelSessionApi(done) {
   var session;
 
-  getToken(host, defineAgeModel);
+  Daybed.getToken(host, defineAgeModel);
 
   function defineAgeModel(err, resp) {
     if (err) throw new Error(err);
-    session = new Session(host, resp.credentials);
+    session = new Daybed.Session(host, resp.credentials);
     session.addModel("age", {
       "title": "simple",
       "description": "One optional field",
@@ -108,11 +108,11 @@ function testModelSessionApi(done) {
 // Test ACLs API
 function testACLsAPI(done) {
   var session, session2, tokenId, tokenId2;
-  getToken(host, deleteAgesModel);
+  Daybed.getToken(host, deleteAgesModel);
 
   function deleteAgesModel(err, resp) {
     if (err) throw new Error(err);
-    session = new Session(host, resp.credentials);
+    session = new Daybed.Session(host, resp.credentials);
     tokenId = resp.credentials.id;
 
     session.deleteModel("ages", addAgesModel);
@@ -135,12 +135,12 @@ function testACLsAPI(done) {
     if (err) throw new Error(err);
     done("Add model", resp);
 
-    getToken(host, putAcls);
+    Daybed.getToken(host, putAcls);
   }
 
   function putAcls(err, resp) {
     if (err) throw new Error(err);
-    session2 = new Session(host, resp.credentials);
+    session2 = new Daybed.Session(host, resp.credentials);
     tokenId2 = resp.credentials.id;
 
     var acls = {"Authenticated": ['delete_model', 'delete_all_records']};
@@ -185,19 +185,19 @@ function testACLsAPI(done) {
   }
 }
 
-// Test Model obj
+// Test Daybed.Model obj
 function testModelApi(done) {
 
   var session,
       books;
 
-  getToken(host, defineBookModel);
+  Daybed.getToken(host, defineBookModel);
 
   function defineBookModel(err, resp) {
     if (err) throw new Error(err);
-    session = new Session(host, resp.credentials);
+    session = new Daybed.Session(host, resp.credentials);
 
-    books = new Model("books", {
+    books = new Daybed.Model("books", {
       title: 'book',
       description: "The list of books to read",
       fields: [
@@ -241,11 +241,11 @@ function testModelApi(done) {
 }
 
 function testSpore(done) {
-  var session = new Session(host);
+  var session = new Daybed.Session(host);
   session.spore(done);
 }
 
 function testFields(done) {
-  var session = new Session(host);
+  var session = new Daybed.Session(host);
   session.availableFields(done);
 }

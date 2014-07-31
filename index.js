@@ -274,7 +274,13 @@
     }
   };
 
-  exports.getToken = getToken;
-  exports.Session = Session;
-  exports.Model = Model;
+
+  var Daybed = {
+    getToken: getToken,
+    Session: Session,
+    Model: Model
+  };
+
+  exports.Daybed = Daybed;
+
 })(this);
