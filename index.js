@@ -69,11 +69,10 @@
         !credentials.hasOwnProperty("id") || credentials.id === undefined ||
         !credentials.hasOwnProperty("key") || credentials.key === undefined) {
       credentials = undefined;
-    } else {
-      this.credentials = credentials;
     }
 
     this.host = host;
+    this.credentials = credentials;
     this.options = options;
   }
 
