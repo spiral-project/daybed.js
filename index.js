@@ -137,7 +137,7 @@
     getAcls: function(modelname, cb) {
       request({
         method: "GET",
-        url: this.host + "/models/" + modelname + "/acls",
+        url: this.host + "/models/" + modelname + "/permissions",
         credentials: this.credentials
       }, cb);
     },
@@ -145,7 +145,7 @@
     putAcls: function(modelname, acls, cb) {
       request({
         method: "PUT",
-        url: this.host + "/models/" + modelname + "/acls",
+        url: this.host + "/models/" + modelname + "/permissions",
         body: acls,
         credentials: this.credentials
       }, cb);
@@ -154,7 +154,7 @@
     patchAcls: function(modelname, rules, cb) {
       request({
         method: "PATCH",
-        url: this.host + "/models/" + modelname + "/acls",
+        url: this.host + "/models/" + modelname + "/permissions",
         body: rules,
         credentials: this.credentials
       }, cb);
