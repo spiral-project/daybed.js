@@ -12,7 +12,7 @@ function testHello(done) {
   getToken(host, hello);
 
   function hello(err, resp) {
-    var session = new DaybedSession(host, resp.credentials);
+    var session = new Session(host, resp.credentials);
     session.hello(done);
   }
 }
@@ -25,7 +25,7 @@ function testModelSessionApi(done) {
 
   function defineAgeModel(err, resp) {
     if (err) throw new Error(err);
-    session = new DaybedSession(host, resp.credentials);
+    session = new Session(host, resp.credentials);
     session.addModel("age", {
       "title": "simple",
       "description": "One optional field",
@@ -112,7 +112,7 @@ function testACLsAPI(done) {
 
   function deleteAgesModel(err, resp) {
     if (err) throw new Error(err);
-    session = new DaybedSession(host, resp.credentials);
+    session = new Session(host, resp.credentials);
     tokenId = resp.credentials.id;
 
     session.deleteModel("ages", addAgesModel);
@@ -140,7 +140,7 @@ function testACLsAPI(done) {
 
   function putAcls(err, resp) {
     if (err) throw new Error(err);
-    session2 = new DaybedSession(host, resp.credentials);
+    session2 = new Session(host, resp.credentials);
     tokenId2 = resp.credentials.id;
 
     var acls = {"Authenticated": ['delete_model', 'delete_all_records']};
@@ -195,7 +195,7 @@ function testModelApi(done) {
 
   function defineBookModel(err, resp) {
     if (err) throw new Error(err);
-    session = new DaybedSession(host, resp.credentials);
+    session = new Session(host, resp.credentials);
 
     books = new Model("books", {
       title: 'book',
@@ -241,11 +241,11 @@ function testModelApi(done) {
 }
 
 function testSpore(done) {
-  var session = new DaybedSession(host);
+  var session = new Session(host);
   session.spore(done);
 }
 
 function testFields(done) {
-  var session = new DaybedSession(host);
+  var session = new Session(host);
   session.availableFields(done);
 }

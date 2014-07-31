@@ -60,7 +60,7 @@
     }, cb);
   }
 
-  function DaybedSession(host, credentials, options) {
+  function Session(host, credentials, options) {
     if (host === undefined) {
       throw new Error("You should provide an host.");
     }
@@ -76,7 +76,7 @@
     this.options = options;
   }
 
-  DaybedSession.prototype = {
+  Session.prototype = {
     hello: function(cb) {
       request({
         method: "GET",
@@ -275,6 +275,6 @@
   };
 
   exports.getToken = getToken;
-  exports.DaybedSession = DaybedSession;
+  exports.Session = Session;
   exports.Model = Model;
 })(this);
