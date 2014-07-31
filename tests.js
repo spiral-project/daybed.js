@@ -15,12 +15,12 @@ function testHello(done) {
   });
 }
 
-// Test add_model and get_model
+// Test addModel and getModel
 function testModelSessionApi(done) {
   getToken(host, function(err, resp) {
     if (err) throw new Error(err);
     var session = new DaybedSession(host, resp.credentials);
-    session.add_model("age", {
+    session.addModel("age", {
       "title": "simple",
       "description": "One optional field",
       "fields": [{"name": "age",
@@ -28,37 +28,37 @@ function testModelSessionApi(done) {
                   "required": false}]
     }, [{"age": 42}], function (err, resp) {
       done("Add model", resp);
-      session.get_model("age", function(err, resp) {
+      session.getModel("age", function(err, resp) {
         if (err) throw new Error(err);
         done("Get model", resp);
-        session.add_record("age", {"id": "123456", "age": 25}, function(err, resp) {
+        session.addRecord("age", {"id": "123456", "age": 25}, function(err, resp) {
           if (err) throw new Error(err);
           done("Add record", resp);
-          session.get_record("age", "123456", function(err, resp) {
+          session.getRecord("age", "123456", function(err, resp) {
             if (err) throw new Error(err);
             done("Get record", resp);
-            session.patch_record("age", "123456", {"age": 41}, function(err, resp) {
+            session.patchRecord("age", "123456", {"age": 41}, function(err, resp) {
               if (err) throw new Error(err);
               done("Patch record", resp);
-              session.delete_record("age", "123456", function(err, resp) {
+              session.deleteRecord("age", "123456", function(err, resp) {
                 if (err) throw new Error(err);
                 done("Delete record", resp);
-                session.add_record("age", {"id": "123456", "age": 25}, function(err, resp) {
+                session.addRecord("age", {"id": "123456", "age": 25}, function(err, resp) {
                   if (err) throw new Error(err);
                   done("Add record", resp);
-                  session.get_records("age", function(err, resp) {
+                  session.getRecords("age", function(err, resp) {
                     if (err) throw new Error(err);
                     done("Get records", resp);
-                    session.delete_records("age", function(err, resp) {
+                    session.deleteRecords("age", function(err, resp) {
                       if (err) throw new Error(err);
                       done("Delete records", resp);
-                      session.get_definition("age", function(err, resp) {
+                      session.getDefinition("age", function(err, resp) {
                         if (err) throw err;
                         done("Model definition", resp);
-                        session.get_acls("age", function(err, resp) {
+                        session.getAcls("age", function(err, resp) {
                           if (err) throw err;
                           done("Model acls", resp);
-                          session.delete_model("age", function(err, resp) {
+                          session.deleteModel("age", function(err, resp) {
                             if (err) throw err;
                             done("Delete model", resp);
                           });
@@ -84,10 +84,10 @@ function testACLsAPI(done) {
     session = new DaybedSession(host, resp.credentials);
     tokenId = resp.credentials.id;
 
-    session.delete_model("ages", function(err, resp) {
+    session.deleteModel("ages", function(err, resp) {
       done("Delete model", err, resp);
 
-      session.add_model("ages", {
+      session.addModel("ages", {
         "title": "simple",
         "description": "One optional field",
         "fields": [{"name": "age",
@@ -107,25 +107,25 @@ function testACLsAPI(done) {
           acls[tokenId2] = ["read_definition", "create_record", "read_own_records",
                             "update_own_records", "delete_own_records"];
 
-          session.put_acls("ages", acls, function(err, resp) {
+          session.putAcls("ages", acls, function(err, resp) {
             if (err) throw new Error(err);
             done("Put ACLs", resp);
 
-            session.patch_acls("ages", {"Everyone": ["read_definition"]}, function(err, resp) {
+            session.patchAcls("ages", {"Everyone": ["read_definition"]}, function(err, resp) {
               if (err) throw new Error(err);
               done("Patch ACLs", resp);
 
-              session.add_record("ages", {"age": 25}, function(err, resp) {
+              session.addRecord("ages", {"age": 25}, function(err, resp) {
                 if (err) throw new Error(err);
                 done("Add tokenId record", resp);
 
-                session2.add_record("ages", {"age": 42}, function(err, resp) {
+                session2.addRecord("ages", {"age": 42}, function(err, resp) {
                   if (err) throw new Error(err);
                   done("Add tokenId2 record", resp);
-                  session.get_records("ages", function(err, resp) {
+                  session.getRecords("ages", function(err, resp) {
                     if (err) throw new Error(err);
                     done("Get tokenId record", resp);
-                    session2.get_records("ages", function(err, resp) {
+                    session2.getRecords("ages", function(err, resp) {
                       if (err) throw new Error(err);
                       done("Get tokenId2 record", resp);
                     });
@@ -177,7 +177,7 @@ function testModelApi(done) {
     );
 
     books.save(function (err, resp) {
-      session.get_model("books", function(err, resp) {
+      session.getModel("books", function(err, resp) {
         done(resp);
         books.delete(done);
       });
@@ -192,5 +192,5 @@ function testSpore(done) {
 
 function testFields(done) {
   var session = new DaybedSession(host);
-  session.available_fields(done);
+  session.availableFields(done);
 }

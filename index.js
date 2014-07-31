@@ -48,10 +48,10 @@ var TIMEOUT = 15000;
     req.send(body);
   }
 
-  function getToken(daybed_url, cb) {
+  function getToken(daybedUrl, cb) {
     request({
       method: "POST",
-      url: daybed_url + "/tokens"
+      url: daybedUrl + "/tokens"
     }, cb);
   }
 
@@ -81,7 +81,7 @@ var TIMEOUT = 15000;
       }, cb);
     },
 
-    add_model: function(modelname, definition, records, cb) {
+    addModel: function(modelname, definition, records, cb) {
       if (cb === undefined) {
         cb = records;
         records = undefined;
@@ -105,7 +105,7 @@ var TIMEOUT = 15000;
       }, cb);
     },
 
-    get_model: function(modelname, cb) {
+    getModel: function(modelname, cb) {
       request({
         method: "GET",
         url: this.host + "/models/" + modelname,
@@ -113,7 +113,7 @@ var TIMEOUT = 15000;
       }, cb);
     },
 
-    delete_model: function(modelname, cb) {
+    deleteModel: function(modelname, cb) {
       request({
         method: "DELETE",
         url: this.host + "/models/" + modelname,
@@ -121,7 +121,7 @@ var TIMEOUT = 15000;
       }, cb);
     },
 
-    get_definition: function(modelname, cb) {
+    getDefinition: function(modelname, cb) {
       request({
         method: "GET",
         url: this.host + "/models/" + modelname + "/definition",
@@ -129,7 +129,7 @@ var TIMEOUT = 15000;
       }, cb);
     },
 
-    get_acls: function(modelname, cb) {
+    getAcls: function(modelname, cb) {
       request({
         method: "GET",
         url: this.host + "/models/" + modelname + "/acls",
@@ -137,7 +137,7 @@ var TIMEOUT = 15000;
       }, cb);
     },
 
-    put_acls: function(modelname, acls, cb) {
+    putAcls: function(modelname, acls, cb) {
       request({
         method: "PUT",
         url: this.host + "/models/" + modelname + "/acls",
@@ -146,7 +146,7 @@ var TIMEOUT = 15000;
       }, cb);
     },
 
-    patch_acls: function(modelname, rules, cb) {
+    patchAcls: function(modelname, rules, cb) {
       request({
         method: "PATCH",
         url: this.host + "/models/" + modelname + "/acls",
@@ -155,7 +155,7 @@ var TIMEOUT = 15000;
       }, cb);
     },
 
-    get_records: function(modelname, cb) {
+    getRecords: function(modelname, cb) {
       request({
         method: "GET",
         url: this.host + "/models/" + modelname + "/records",
@@ -163,7 +163,7 @@ var TIMEOUT = 15000;
       }, cb);
     },
 
-    delete_records: function(modelname, cb) {
+    deleteRecords: function(modelname, cb) {
       request({
         method: "DELETE",
         url: this.host + "/models/" + modelname + "/records",
@@ -171,15 +171,15 @@ var TIMEOUT = 15000;
       }, cb);
     },
 
-    get_record: function(modelname, record_id, cb) {
+    getRecord: function(modelname, recordId, cb) {
       request({
         method: "GET",
-        url: this.host + "/models/" + modelname + "/records/" + record_id,
+        url: this.host + "/models/" + modelname + "/records/" + recordId,
         credentials: this.credentials
       }, cb);
     },
 
-    add_record: function(modelname, record, cb) {
+    addRecord: function(modelname, record, cb) {
       var url, method;
 
       if (!record.hasOwnProperty("id")) {
@@ -198,24 +198,24 @@ var TIMEOUT = 15000;
       }, cb);
     },
 
-    patch_record: function(modelname, record_id, patch, cb) {
+    patchRecord: function(modelname, recordId, patch, cb) {
       request({
         method: "PATCH",
-        url: this.host + "/models/" + modelname + "/records/" + record_id,
+        url: this.host + "/models/" + modelname + "/records/" + recordId,
         body: patch,
         credentials: this.credentials
       }, cb);
     },
 
-    delete_record: function(modelname, record_id, cb) {
+    deleteRecord: function(modelname, recordId, cb) {
       request({
         method: "DELETE",
-        url: this.host + "/models/" + modelname + "/records/" + record_id,
+        url: this.host + "/models/" + modelname + "/records/" + recordId,
         credentials: this.credentials
       }, cb);
     },
 
-    available_fields: function(cb) {
+    availableFields: function(cb) {
       request({
         method: "GET",
         url: this.host + "/fields"
@@ -243,10 +243,10 @@ var TIMEOUT = 15000;
       this.records.push(record);
     },
     save: function(cb) {
-      this.session.add_model(this.modelname, this.definition, this.records, cb);
+      this.session.addModel(this.modelname, this.definition, this.records, cb);
     },
     delete: function(cb) {
-      this.session.delete_model(this.modelname, cb);
+      this.session.deleteModel(this.modelname, cb);
     }
   };
 
