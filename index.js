@@ -2,9 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-"use strict";
-
 (function(exports) {
+
+  "use strict";
 
   var TIMEOUT = 15000;
 
@@ -64,7 +64,7 @@
     if (host === undefined) {
       throw new Error("You should provide an host.");
     }
-  
+
     if (credentials === undefined ||
         !credentials.hasOwnProperty("id") || credentials.id === undefined ||
         !credentials.hasOwnProperty("key") || credentials.key === undefined) {
@@ -72,7 +72,7 @@
     } else {
       this.credentials = credentials;
     }
-  
+
     this.host = host;
     this.options = options;
   }
@@ -93,7 +93,7 @@
       }
 
       var url, method;
-      
+
       if (modelname === undefined) {
         method = "POST";
         url = this.host + "/models";
