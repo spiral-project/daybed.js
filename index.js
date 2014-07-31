@@ -3,9 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 "use strict";
-var TIMEOUT = 15000;
 
 (function(exports) {
+
+  var TIMEOUT = 15000;
 
   function callback(cb, args) {
     if (cb && typeof cb === 'function') {
@@ -21,6 +22,10 @@ var TIMEOUT = 15000;
     req.responseType = 'json';
     req.timeout = TIMEOUT;
     // req.withCredentials = true;
+
+    if (options.validateOnly) {
+      req.setRequestHeader('Validate-Only', 'true');
+    }
 
     if (options.credentials) {
       var hawkHeader = hawk.client.header(options.url, options.method, {
@@ -194,6 +199,26 @@ var TIMEOUT = 15000;
         method: method,
         url: url,
         body: record,
+        credentials: this.credentials
+      }, cb);
+    },
+
+    validateRecord: function(modelname, record, cb) {
+      var url, method;
+
+      if (!record.hasOwnProperty("id")) {
+        method = "POST";
+        url = this.host + "/models/" + modelname + "/records";
+      } else {
+        method = "PUT";
+        url = this.host + "/models/" + modelname + "/records/" + record.id;
+      }
+
+      request({
+        method: method,
+        url: url,
+        body: record,
+        validateOnly: true,
         credentials: this.credentials
       }, cb);
     },
