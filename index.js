@@ -17,6 +17,7 @@ var TIMEOUT = 15000;
     var req = new XMLHttpRequest();
     req.open(options.method, options.url, true);
     req.setRequestHeader('Content-Type', 'application/json');
+    req.setRequestHeader('Accept', 'application/json');
     req.responseType = 'json';
     req.timeout = TIMEOUT;
     // req.withCredentials = true;
@@ -28,7 +29,7 @@ var TIMEOUT = 15000;
       req.setRequestHeader('authorization', hawkHeader.field);
     }
     req.onload = function() {
-      if (!("" + req.status).match(/^2/) && !("" + req.status).match(/^3/)) {
+      if (!("" + req.status).match(/^2/)) {
         callback(cb, [req.response]);
         return;
       }
@@ -59,13 +60,15 @@ var TIMEOUT = 15000;
       throw new Error("You should provide an host.");
     }
   
-    if (!credentials.hasOwnProperty("id") || credentials.id === undefined || 
+    if (credentials === undefined ||
+        !credentials.hasOwnProperty("id") || credentials.id === undefined ||
         !credentials.hasOwnProperty("key") || credentials.key === undefined) {
-      throw new Error("You cannot create a session without valid credentials.");
+      credentials = undefined;
+    } else {
+      this.credentials = credentials;
     }
   
     this.host = host;
-    this.credentials = credentials;
     this.options = options;
   }
 
@@ -78,7 +81,7 @@ var TIMEOUT = 15000;
       }, cb);
     },
 
-    add_model: function(name, definition, records, cb) {
+    add_model: function(modelname, definition, records, cb) {
       if (cb === undefined) {
         cb = records;
         records = undefined;
@@ -86,12 +89,12 @@ var TIMEOUT = 15000;
 
       var url, method;
       
-      if (name === undefined) {
+      if (modelname === undefined) {
         method = "POST";
         url = this.host + "/models";
       } else {
         method = "PUT";
-        url = this.host + "/models/" + name;
+        url = this.host + "/models/" + modelname;
       }
 
       request({
@@ -102,26 +105,134 @@ var TIMEOUT = 15000;
       }, cb);
     },
 
-    get_model: function(name, cb) {
+    get_model: function(modelname, cb) {
       request({
         method: "GET",
-        url: this.host + "/models/" + name,
+        url: this.host + "/models/" + modelname,
         credentials: this.credentials
       }, cb);
     },
 
-    delete_model: function(name, cb) {
+    delete_model: function(modelname, cb) {
       request({
         method: "DELETE",
-        url: this.host + "/models/" + name,
+        url: this.host + "/models/" + modelname,
         credentials: this.credentials
+      }, cb);
+    },
+
+    get_definition: function(modelname, cb) {
+      request({
+        method: "GET",
+        url: this.host + "/models/" + modelname + "/definition",
+        credentials: this.credentials
+      }, cb);
+    },
+
+    get_acls: function(modelname, cb) {
+      request({
+        method: "GET",
+        url: this.host + "/models/" + modelname + "/acls",
+        credentials: this.credentials
+      }, cb);
+    },
+
+    put_acls: function(modelname, acls, cb) {
+      request({
+        method: "PUT",
+        url: this.host + "/models/" + modelname + "/acls",
+        body: acls,
+        credentials: this.credentials
+      }, cb);
+    },
+
+    patch_acls: function(modelname, rules, cb) {
+      request({
+        method: "PATCH",
+        url: this.host + "/models/" + modelname + "/acls",
+        body: rules,
+        credentials: this.credentials
+      }, cb);
+    },
+
+    get_records: function(modelname, cb) {
+      request({
+        method: "GET",
+        url: this.host + "/models/" + modelname + "/records",
+        credentials: this.credentials
+      }, cb);
+    },
+
+    delete_records: function(modelname, cb) {
+      request({
+        method: "DELETE",
+        url: this.host + "/models/" + modelname + "/records",
+        credentials: this.credentials
+      }, cb);
+    },
+
+    get_record: function(modelname, record_id, cb) {
+      request({
+        method: "GET",
+        url: this.host + "/models/" + modelname + "/records/" + record_id,
+        credentials: this.credentials
+      }, cb);
+    },
+
+    add_record: function(modelname, record, cb) {
+      var url, method;
+
+      if (!record.hasOwnProperty("id")) {
+        method = "POST";
+        url = this.host + "/models/" + modelname + "/records";
+      } else {
+        method = "PUT";
+        url = this.host + "/models/" + modelname + "/records/" + record.id;
+      }
+
+      request({
+        method: method,
+        url: url,
+        body: record,
+        credentials: this.credentials
+      }, cb);
+    },
+
+    patch_record: function(modelname, record_id, patch, cb) {
+      request({
+        method: "PATCH",
+        url: this.host + "/models/" + modelname + "/records/" + record_id,
+        body: patch,
+        credentials: this.credentials
+      }, cb);
+    },
+
+    delete_record: function(modelname, record_id, cb) {
+      request({
+        method: "DELETE",
+        url: this.host + "/models/" + modelname + "/records/" + record_id,
+        credentials: this.credentials
+      }, cb);
+    },
+
+    available_fields: function(cb) {
+      request({
+        method: "GET",
+        url: this.host + "/fields"
+      }, cb);
+    },
+
+    spore: function(cb) {
+      request({
+        method: "GET",
+        url: this.host + "/spore"
       }, cb);
     }
   };
 
 
-  function Model(name, definition, session, records) {
-    this.name = name;
+  function Model(modelname, definition, session, records) {
+    this.modelname = modelname;
     this.definition = definition;
     this.records = records || [];
     this.session = session;
@@ -132,10 +243,10 @@ var TIMEOUT = 15000;
       this.records.push(record);
     },
     save: function(cb) {
-      this.session.add_model(this.name, this.definition, this.records, cb);
+      this.session.add_model(this.modelname, this.definition, this.records, cb);
     },
     delete: function(cb) {
-      this.session.delete_model(this.name, cb);
+      this.session.delete_model(this.modelname, cb);
     }
   };
 
