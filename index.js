@@ -8,70 +8,66 @@
 
   var TIMEOUT = 15000;
 
-  function callback(cb, args) {
-    if (cb && typeof cb === 'function') {
-      cb.apply(null, args);
-    }
-  }
+  function request(options) {
+    return new Promise(function(resolve, reject) {
+      var req = new XMLHttpRequest();
+      req.open(options.method, options.url, true);
+      req.setRequestHeader('Content-Type', 'application/json');
+      req.setRequestHeader('Accept', 'application/json');
+      req.responseType = 'json';
+      req.timeout = TIMEOUT;
+      // req.withCredentials = true;
 
-  function request(options, cb) {
-    var req = new XMLHttpRequest();
-    req.open(options.method, options.url, true);
-    req.setRequestHeader('Content-Type', 'application/json');
-    req.setRequestHeader('Accept', 'application/json');
-    req.responseType = 'json';
-    req.timeout = TIMEOUT;
-    // req.withCredentials = true;
-
-    if (options.validateOnly) {
-      req.setRequestHeader('Validate-Only', 'true');
-    }
-
-    if (options.credentials) {
-      var hawkHeader = hawk.client.header(options.url, options.method, {
-        credentials: options.credentials
-      });
-      req.setRequestHeader('authorization', hawkHeader.field);
-    }
-    req.onload = function() {
-      if (!("" + req.status).match(/^2/)) {
-        callback(cb, [req.response]);
-        return;
+      if (options.validateOnly) {
+        req.setRequestHeader('Validate-Only', 'true');
       }
-      callback(cb, [null, req.response]);
-    };
 
-    req.onerror = req.ontimeout = function(event) {
-      callback(cb, [event.target.status]);
-    };
+      if (options.credentials) {
+        var hawkHeader = hawk.client.header(options.url, options.method, {
+          credentials: options.credentials
+        });
+        req.setRequestHeader('authorization', hawkHeader.field);
+      }
+      req.onload = function() {
+        if (!("" + req.status).match(/^2/)) {
+          reject(req.response);
+          return;
+        }
+        resolve(req.response);
+      };
 
-    var body;
-    if (options.body) {
-      body = JSON.stringify(options.body);
-    }
+      req.onerror = req.ontimeout = function(event) {
+        reject(event.target.status);
+      };
 
-    req.send(body);
+      var body;
+      if (options.body) {
+        body = JSON.stringify(options.body);
+      }
+      
+      req.send(body);
+    });
   }
 
-  function getToken(daybedUrl, cb) {
-    request({
+  function getToken(daybedUrl) {
+    return request({
       method: "POST",
       url: daybedUrl + "/tokens"
-    }, cb);
+    });
   }
 
-  function availableFields(host, cb) {
-    request({
+  function availableFields(host) {
+    return request({
       method: "GET",
       url: host + "/fields"
-    }, cb);
+    });
   }
 
-  function spore(host, cb) {
-    request({
+  function spore(host) {
+    return request({
       method: "GET",
       url: host + "/spore"
-    }, cb);
+    });
   }
 
 
@@ -92,20 +88,15 @@
   }
 
   Session.prototype = {
-    hello: function(cb) {
-      request({
+    hello: function() {
+      return request({
         method: "GET",
         url: this.host + "/",
         credentials: this.credentials
-      }, cb);
+      });
     },
 
-    addModel: function(modelname, definition, records, cb) {
-      if (cb === undefined) {
-        cb = records;
-        records = undefined;
-      }
-
+    addModel: function(modelname, definition, records) {
       var url, method;
 
       if (modelname === undefined) {
@@ -116,89 +107,89 @@
         url = this.host + "/models/" + modelname;
       }
 
-      request({
+      return request({
         method: method,
         url: url,
         body: {definition: definition, records: records},
         credentials: this.credentials
-      }, cb);
+      });
     },
 
-    getModel: function(modelname, cb) {
-      request({
+    getModel: function(modelname) {
+      return request({
         method: "GET",
         url: this.host + "/models/" + modelname,
         credentials: this.credentials
-      }, cb);
+      });
     },
 
-    deleteModel: function(modelname, cb) {
-      request({
+    deleteModel: function(modelname) {
+      return request({
         method: "DELETE",
         url: this.host + "/models/" + modelname,
         credentials: this.credentials
-      }, cb);
+      });
     },
 
-    getDefinition: function(modelname, cb) {
-      request({
+    getDefinition: function(modelname) {
+      return request({
         method: "GET",
         url: this.host + "/models/" + modelname + "/definition",
         credentials: this.credentials
-      }, cb);
+      });
     },
 
-    getPermissions: function(modelname, cb) {
-      request({
+    getPermissions: function(modelname) {
+      return request({
         method: "GET",
         url: this.host + "/models/" + modelname + "/permissions",
         credentials: this.credentials
-      }, cb);
+      });
     },
 
-    putPermissions: function(modelname, permissions, cb) {
-      request({
+    putPermissions: function(modelname, permissions) {
+      return request({
         method: "PUT",
         url: this.host + "/models/" + modelname + "/permissions",
         body: permissions,
         credentials: this.credentials
-      }, cb);
+      });
     },
 
-    patchPermissions: function(modelname, rules, cb) {
-      request({
+    patchPermissions: function(modelname, rules) {
+      return request({
         method: "PATCH",
         url: this.host + "/models/" + modelname + "/permissions",
         body: rules,
         credentials: this.credentials
-      }, cb);
+      });
     },
 
-    getRecords: function(modelname, cb) {
-      request({
+    getRecords: function(modelname) {
+      return request({
         method: "GET",
         url: this.host + "/models/" + modelname + "/records",
         credentials: this.credentials
-      }, cb);
+      });
     },
 
-    deleteRecords: function(modelname, cb) {
-      request({
+    deleteRecords: function(modelname) {
+      return request({
         method: "DELETE",
         url: this.host + "/models/" + modelname + "/records",
         credentials: this.credentials
-      }, cb);
+      });
     },
 
-    getRecord: function(modelname, recordId, cb) {
-      request({
+    getRecord: function(modelname, recordId) {
+      return request({
         method: "GET",
         url: this.host + "/models/" + modelname + "/records/" + recordId,
         credentials: this.credentials
-      }, cb);
+      });
     },
 
-    addRecord: function(modelname, record, cb) {
+    addRecord: function(modelname, record) {
       var url, method;
 
       if (!record.hasOwnProperty("id")) {
@@ -209,15 +200,15 @@
         url = this.host + "/models/" + modelname + "/records/" + record.id;
       }
 
-      request({
+      return request({
         method: method,
         url: url,
         body: record,
         credentials: this.credentials
-      }, cb);
+      });
     },
 
-    validateRecord: function(modelname, record, cb) {
+    validateRecord: function(modelname, record) {
       var url, method;
 
       if (!record.hasOwnProperty("id")) {
@@ -228,50 +219,70 @@
         url = this.host + "/models/" + modelname + "/records/" + record.id;
       }
 
-      request({
+      return request({
         method: method,
         url: url,
         body: record,
         validateOnly: true,
         credentials: this.credentials
-      }, cb);
+      });
     },
 
-    patchRecord: function(modelname, recordId, patch, cb) {
-      request({
+    patchRecord: function(modelname, recordId, patch) {
+      return request({
         method: "PATCH",
         url: this.host + "/models/" + modelname + "/records/" + recordId,
         body: patch,
         credentials: this.credentials
-      }, cb);
+      });
     },
 
-    deleteRecord: function(modelname, recordId, cb) {
-      request({
+    deleteRecord: function(modelname, recordId) {
+      return request({
         method: "DELETE",
         url: this.host + "/models/" + modelname + "/records/" + recordId,
         credentials: this.credentials
-      }, cb);
+      });
     }
   };
 
 
-  function Model(modelname, definition, session, records) {
-    this.modelname = modelname;
-    this.definition = definition;
-    this.records = records || [];
+  function Model(session, modelname, definition, records) {
     this.session = session;
+    this.modelname = modelname;
+
+    this._definition = definition;
+    this._records = records || [];
   }
 
   Model.prototype = {
+    load: function() {
+      var self = this;
+      return new Promise(function(resolve, reject) {
+        self.session.getModel(self.modelname).then(function(resp) {
+          console.debug(self._definition, "has been replaced by", resp.definition);
+          console.debug(self._records, "has been replaced by", resp.records);
+
+          self._definition = resp.definition;
+          self._records = resp.records;
+          resolve();
+        }).catch(reject);
+      });
+    },
     add: function(record) {
-      this.records.push(record);
+      this._records.push(record);
     },
-    save: function(cb) {
-      this.session.addModel(this.modelname, this.definition, this.records, cb);
+    definition: function() {
+      return this._definition;
     },
-    delete: function(cb) {
-      this.session.deleteModel(this.modelname, cb);
+    records: function() {
+      return this._records;
+    },
+    save: function() {
+      return this.session.addModel(this.modelname, this._definition, this._records);
+    },
+    delete: function() {
+      return this.session.deleteModel(this.modelname);
     }
   };
 
