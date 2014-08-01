@@ -60,6 +60,21 @@
     }, cb);
   }
 
+  function availableFields(host, cb) {
+    request({
+      method: "GET",
+      url: host + "/fields"
+    }, cb);
+  }
+
+  function spore(host, cb) {
+    request({
+      method: "GET",
+      url: host + "/spore"
+    }, cb);
+  }
+
+
   function Session(host, credentials, options) {
     if (host === undefined) {
       throw new Error("You should provide an host.");
@@ -237,20 +252,6 @@
         url: this.host + "/models/" + modelname + "/records/" + recordId,
         credentials: this.credentials
       }, cb);
-    },
-
-    availableFields: function(cb) {
-      request({
-        method: "GET",
-        url: this.host + "/fields"
-      }, cb);
-    },
-
-    spore: function(cb) {
-      request({
-        method: "GET",
-        url: this.host + "/spore"
-      }, cb);
     }
   };
 
@@ -277,6 +278,8 @@
 
   var Daybed = {
     getToken: getToken,
+    availableFields: availableFields,
+    spore: spore,
     Session: Session,
     Model: Model
   };

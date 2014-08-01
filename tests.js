@@ -241,11 +241,9 @@ function testModelApi(done) {
 }
 
 function testSpore(done) {
-  var session = new Daybed.Session(host);
-  session.spore(done);
+  Daybed.spore(host, done);
 }
 
 function testFields(done) {
-  var session = new Daybed.Session(host);
-  session.availableFields(done);
+  Daybed.availableFields(host, done);
 }

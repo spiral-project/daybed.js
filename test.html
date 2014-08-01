@@ -7,14 +7,12 @@
     <body>
         <script type="text/javascript">
           function runTests(done) {
-            testHello(function(err, resp) {
-              done(resp);
-              testModelApi(done);
-              testModelSessionApi(done);
-              testSpore(done);
-              testFields(done);
-              testPermissionsAPI(done);
-            });
+            testHello(done);
+            testModelApi(done);
+            testModelSessionApi(done);
+            testSpore(done);
+            testFields(done);
+            testPermissionsAPI(done);
           }
         </script>
     </body>
