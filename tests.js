@@ -7,146 +7,197 @@
 // Write some tests
 var host = "http://localhost:8000";
 
-// Test getToken and hello
+// Test Daybed.getToken and hello
 function testHello(done) {
-  getToken(host, function(err, resp) {
-    var session = new DaybedSession(host, resp.credentials);
+  Daybed.getToken(host, hello);
+
+  function hello(err, resp) {
+    var session = new Daybed.Session(host, resp.credentials);
     session.hello(done);
-  });
+  }
 }
 
 // Test addModel and getModel
 function testModelSessionApi(done) {
-  getToken(host, function(err, resp) {
+  var session;
+
+  Daybed.getToken(host, defineAgeModel);
+
+  function defineAgeModel(err, resp) {
     if (err) throw new Error(err);
-    var session = new DaybedSession(host, resp.credentials);
+    session = new Daybed.Session(host, resp.credentials);
     session.addModel("age", {
       "title": "simple",
       "description": "One optional field",
       "fields": [{"name": "age",
                   "type": "int",
                   "required": false}]
-    }, [{"age": 42}], function (err, resp) {
-      done("Add model", resp);
-      session.getModel("age", function(err, resp) {
-        if (err) throw new Error(err);
-        done("Get model", resp);
-        session.addRecord("age", {"id": "123456", "age": 25}, function(err, resp) {
-          if (err) throw new Error(err);
-          done("Add record", resp);
-          session.getRecord("age", "123456", function(err, resp) {
-            if (err) throw new Error(err);
-            done("Get record", resp);
-            session.patchRecord("age", "123456", {"age": 41}, function(err, resp) {
-              if (err) throw new Error(err);
-              done("Patch record", resp);
-              session.deleteRecord("age", "123456", function(err, resp) {
-                if (err) throw new Error(err);
-                done("Delete record", resp);
-                session.addRecord("age", {"id": "123456", "age": 25}, function(err, resp) {
-                  if (err) throw new Error(err);
-                  done("Add record", resp);
-                  session.getRecords("age", function(err, resp) {
-                    if (err) throw new Error(err);
-                    done("Get records", resp);
-                    session.deleteRecords("age", function(err, resp) {
-                      if (err) throw new Error(err);
-                      done("Delete records", resp);
-                      session.getDefinition("age", function(err, resp) {
-                        if (err) throw err;
-                        done("Model definition", resp);
-                        session.getAcls("age", function(err, resp) {
-                          if (err) throw err;
-                          done("Model acls", resp);
-                          session.deleteModel("age", function(err, resp) {
-                            if (err) throw err;
-                            done("Delete model", resp);
-                          });
-                        });
-                      });
-                    });
-                  });
-                });
-              });
-            });
-          });
-        });
-      });
+    }, [{"age": 42}], getAgeModel);
+  }
+
+  function getAgeModel(err, resp) {
+    if (err) throw new Error(err);
+    done("Add model", resp);
+    session.getModel("age", addRecord);
+  }
+
+  function addRecord(err, resp) {
+    if (err) throw new Error(err);
+    done("Get model", resp);
+    session.addRecord("age", {"id": "123456", "age": 25}, getRecord);
+  }
+
+  function getRecord(err, resp) {
+    if (err) throw new Error(err);
+    done("Add record", resp);
+    session.getRecord("age", "123456", patchRecord);
+  }
+
+  function patchRecord(err, resp) {
+    if (err) throw new Error(err);
+    done("Get record", resp);
+    session.patchRecord("age", "123456", {"age": 41}, deleteRecord);
+  }
+
+  function deleteRecord(err, resp) {
+    if (err) throw new Error(err);
+    done("Patch record", resp);
+    session.deleteRecord("age", "123456", addOtherRecord);
+  }
+
+  function addOtherRecord(err, resp) {
+    if (err) throw new Error(err);
+    done("Delete record", resp);
+    session.addRecord("age", {"id": "123456", "age": 25}, getRecords);
+  }
+
+  function getRecords(err, resp) {
+    if (err) throw new Error(err);
+    done("Add record", resp);
+    session.getRecords("age", deleteRecords);
+  }
+
+  function deleteRecords(err, resp) {
+    if (err) throw new Error(err);
+    done("Get records", resp);
+    session.deleteRecords("age", getDefinition);
+  }
+
+  function getDefinition(err, resp) {
+    if (err) throw new Error(err);
+    done("Delete records", resp);
+    session.getDefinition("age", getAcls);
+  }
+
+  function getAcls(err, resp) {
+    if (err) throw new Error(err);
+    done("Model definition", resp);
+    session.getAcls("age", deleteModel);
+  }
+
+  function deleteModel(err, resp) {
+    if (err) throw err;
+    done("Model acls", resp);
+    session.deleteModel("age", function(err, resp) {
+      if (err) throw err;
+      done("Delete model", resp);
     });
-  });
+  }
 }
 
 // Test ACLs API
 function testACLsAPI(done) {
   var session, session2, tokenId, tokenId2;
-  getToken(host, function(err, resp) {
+  Daybed.getToken(host, deleteAgesModel);
+
+  function deleteAgesModel(err, resp) {
     if (err) throw new Error(err);
-    session = new DaybedSession(host, resp.credentials);
+    session = new Daybed.Session(host, resp.credentials);
     tokenId = resp.credentials.id;
 
-    session.deleteModel("ages", function(err, resp) {
-      done("Delete model", err, resp);
+    session.deleteModel("ages", addAgesModel);
+  }
 
-      session.addModel("ages", {
-        "title": "simple",
-        "description": "One optional field",
-        "fields": [{"name": "age",
-                    "type": "int",
-                    "required": false}]
-      }, function (err, resp) {
-        if (err) throw new Error(err);
-        done("Add model", resp);
+  function addAgesModel(err, resp) {
+    if (err) throw new Error(err);
+    done("Delete model", err, resp);
 
-        getToken(host, function(err, resp) {
-          if (err) throw new Error(err);
-          session2 = new DaybedSession(host, resp.credentials);
-          tokenId2 = resp.credentials.id;
+    session.addModel("ages", {
+      "title": "simple",
+      "description": "One optional field",
+      "fields": [{"name": "age",
+                  "type": "int",
+                  "required": false}]
+    }, getOtherToken);
+  }
 
-          var acls = {"Authenticated": ['delete_model', 'delete_all_records']};
-          acls[tokenId] = ["ALL"];
-          acls[tokenId2] = ["read_definition", "create_record", "read_own_records",
-                            "update_own_records", "delete_own_records"];
+  function getOtherToken(err, resp) {
+    if (err) throw new Error(err);
+    done("Add model", resp);
 
-          session.putAcls("ages", acls, function(err, resp) {
-            if (err) throw new Error(err);
-            done("Put ACLs", resp);
+    Daybed.getToken(host, putAcls);
+  }
 
-            session.patchAcls("ages", {"Everyone": ["read_definition"]}, function(err, resp) {
-              if (err) throw new Error(err);
-              done("Patch ACLs", resp);
+  function putAcls(err, resp) {
+    if (err) throw new Error(err);
+    session2 = new Daybed.Session(host, resp.credentials);
+    tokenId2 = resp.credentials.id;
 
-              session.addRecord("ages", {"age": 25}, function(err, resp) {
-                if (err) throw new Error(err);
-                done("Add tokenId record", resp);
+    var acls = {"Authenticated": ['delete_model', 'delete_all_records']};
+    acls[tokenId] = ["ALL"];
+    acls[tokenId2] = ["read_definition", "create_record", "read_own_records",
+                      "update_own_records", "delete_own_records"];
 
-                session2.addRecord("ages", {"age": 42}, function(err, resp) {
-                  if (err) throw new Error(err);
-                  done("Add tokenId2 record", resp);
-                  session.getRecords("ages", function(err, resp) {
-                    if (err) throw new Error(err);
-                    done("Get tokenId record", resp);
-                    session2.getRecords("ages", function(err, resp) {
-                      if (err) throw new Error(err);
-                      done("Get tokenId2 record", resp);
-                    });
-                  });
-                });
-              });
-            });
-          });
-        });
-      });
+    session.putAcls("ages", acls, patchAcls);
+  }
+
+  function patchAcls(err, resp) {
+    if (err) throw new Error(err);
+    done("Put ACLs", resp);
+    session.patchAcls("ages", {"Everyone": ["read_definition"]}, addRecord);
+  }
+
+  function addRecord(err, resp) {
+    if (err) throw new Error(err);
+    done("Patch ACLs", resp);
+    session.addRecord("ages", {"age": 25}, addRecord2);
+  }
+
+  function addRecord2(err, resp) {
+    if (err) throw new Error(err);
+    done("Add tokenId record", resp);
+    session2.addRecord("ages", {"age": 42}, getRecords);
+  }
+
+  function getRecords(err, resp) {
+    if (err) throw new Error(err);
+    done("Add tokenId2 record", resp);
+    session.getRecords("ages", getRecords2);
+  }
+
+  function getRecords2(err, resp) {
+    if (err) throw new Error(err);
+    done("Get tokenId record", resp);
+    session2.getRecords("ages", function(err, resp) {
+      if (err) throw new Error(err);
+      done("Get tokenId2 record", resp);
     });
-  });
+  }
 }
 
-// Test Model obj
+// Test Daybed.Model obj
 function testModelApi(done) {
-  getToken(host, function(err, resp) {
-    if (err) throw new Error(err);
-    var session = new DaybedSession(host, resp.credentials);
 
-    var books = new Model("books", {
+  var session,
+      books;
+
+  Daybed.getToken(host, defineBookModel);
+
+  function defineBookModel(err, resp) {
+    if (err) throw new Error(err);
+    session = new Daybed.Session(host, resp.credentials);
+
+    books = new Daybed.Model("books", {
       title: 'book',
       description: "The list of books to read",
       fields: [
@@ -176,21 +227,25 @@ function testModelApi(done) {
       }
     );
 
-    books.save(function (err, resp) {
-      session.getModel("books", function(err, resp) {
-        done(resp);
-        books.delete(done);
-      });
-    });
-  });
+    books.save();
+  }
+
+  function getBookModel(err, resp) {
+    session.getModel("books", deleteBookModel);
+  }
+
+  function deleteBookModel(err, resp) {
+    done(resp);
+    books.delete(done);
+  }
 }
 
 function testSpore(done) {
-  var session = new DaybedSession(host);
+  var session = new Daybed.Session(host);
   session.spore(done);
 }
 
 function testFields(done) {
-  var session = new DaybedSession(host);
+  var session = new Daybed.Session(host);
   session.availableFields(done);
 }

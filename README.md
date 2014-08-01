@@ -1,6 +1,6 @@
 # Daybed.js
 
-A library to use daybed easily.
+A library to use Daybed easily.
 
 ## Example
 
@@ -9,14 +9,14 @@ would like to read.
 
 First you need to create a session:
 
-    var session = new DaybedSession({
+    var session = new Daybed.Session({
       hawkSession: hawkSession,
       url: 'http://daybed.spiral-project.org'
     })
 
 And then create your model (and use it):
 
-    var books = new Model({
+    var books = new Daybed.Model({
       title: 'book',
       description: "The list of books to read",
       fields: [{
