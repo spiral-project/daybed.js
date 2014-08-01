@@ -251,10 +251,8 @@
     this.session = session;
     this.modelname = modelname;
 
-    var self = this;
-
-    self._definition = definition;
-    self._records = records || [];
+    this._definition = definition;
+    this._records = records || [];
   }
 
   Model.prototype = {
