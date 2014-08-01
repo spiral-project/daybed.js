@@ -86,18 +86,18 @@ function testModelSessionApi(done) {
   function getDefinition(err, resp) {
     if (err) throw new Error(err);
     done("Delete records", resp);
-    session.getDefinition("age", getAcls);
+    session.getDefinition("age", getPermissions);
   }
 
-  function getAcls(err, resp) {
+  function getPermissions(err, resp) {
     if (err) throw new Error(err);
     done("Model definition", resp);
-    session.getAcls("age", deleteModel);
+    session.getPermissions("age", deleteModel);
   }
 
   function deleteModel(err, resp) {
     if (err) throw err;
-    done("Model acls", resp);
+    done("Model permissions", resp);
     session.deleteModel("age", function(err, resp) {
       if (err) throw err;
       done("Delete model", resp);
@@ -105,22 +105,15 @@ function testModelSessionApi(done) {
   }
 }
 
-// Test ACLs API
-function testACLsAPI(done) {
+// Test Permissions API
+function testPermissionsAPI(done) {
   var session, session2, tokenId, tokenId2;
-  Daybed.getToken(host, deleteAgesModel);
-
-  function deleteAgesModel(err, resp) {
-    if (err) throw new Error(err);
-    session = new Daybed.Session(host, resp.credentials);
-    tokenId = resp.credentials.id;
-
-    session.deleteModel("ages", addAgesModel);
-  }
+  Daybed.getToken(host, addAgesModel);
 
   function addAgesModel(err, resp) {
     if (err) throw new Error(err);
-    done("Delete model", err, resp);
+    session = new Daybed.Session(host, resp.credentials);
+    tokenId = resp.credentials.id;
 
     session.addModel("ages", {
       "title": "simple",
@@ -135,31 +128,31 @@ function testACLsAPI(done) {
     if (err) throw new Error(err);
     done("Add model", resp);
 
-    Daybed.getToken(host, putAcls);
+    Daybed.getToken(host, putPermissions);
   }
 
-  function putAcls(err, resp) {
+  function putPermissions(err, resp) {
     if (err) throw new Error(err);
     session2 = new Daybed.Session(host, resp.credentials);
     tokenId2 = resp.credentials.id;
 
-    var acls = {"Authenticated": ['delete_model', 'delete_all_records']};
-    acls[tokenId] = ["ALL"];
-    acls[tokenId2] = ["read_definition", "create_record", "read_own_records",
+    var permissions = {"Authenticated": ['delete_model', 'delete_all_records']};
+    permissions[tokenId] = ["ALL"];
+    permissions[tokenId2] = ["read_definition", "create_record", "read_own_records",
                       "update_own_records", "delete_own_records"];
 
-    session.putAcls("ages", acls, patchAcls);
+    session.putPermissions("ages", permissions, patchPermissions);
   }
 
-  function patchAcls(err, resp) {
+  function patchPermissions(err, resp) {
     if (err) throw new Error(err);
-    done("Put ACLs", resp);
-    session.patchAcls("ages", {"Everyone": ["read_definition"]}, addRecord);
+    done("Put Permissions", resp);
+    session.patchPermissions("ages", {"Everyone": ["read_definition"]}, addRecord);
   }
 
   function addRecord(err, resp) {
     if (err) throw new Error(err);
-    done("Patch ACLs", resp);
+    done("Patch Permissions", resp);
     session.addRecord("ages", {"age": 25}, addRecord2);
   }
 
@@ -178,9 +171,16 @@ function testACLsAPI(done) {
   function getRecords2(err, resp) {
     if (err) throw new Error(err);
     done("Get tokenId record", resp);
-    session2.getRecords("ages", function(err, resp) {
+    session2.getRecords("ages", deleteAgesModel);
+  }
+
+  function deleteAgesModel(err, resp) {
+    if (err) throw new Error(err);
+    done("Get tokenId2 record", resp);
+
+    session.deleteModel("ages", function(err, resp) {
       if (err) throw new Error(err);
-      done("Get tokenId2 record", resp);
+      done("Delete ages", resp);
     });
   }
 }
@@ -227,7 +227,7 @@ function testModelApi(done) {
       }
     );
 
-    books.save();
+    books.save(getBookModel);
   }
 
   function getBookModel(err, resp) {

@@ -133,7 +133,7 @@
       }, cb);
     },
 
-    getAcls: function(modelname, cb) {
+    getPermissions: function(modelname, cb) {
       request({
         method: "GET",
         url: this.host + "/models/" + modelname + "/permissions",
@@ -141,16 +141,16 @@
       }, cb);
     },
 
-    putAcls: function(modelname, acls, cb) {
+    putPermissions: function(modelname, permissions, cb) {
       request({
         method: "PUT",
         url: this.host + "/models/" + modelname + "/permissions",
-        body: acls,
+        body: permissions,
         credentials: this.credentials
       }, cb);
     },
 
-    patchAcls: function(modelname, rules, cb) {
+    patchPermissions: function(modelname, rules, cb) {
       request({
         method: "PATCH",
         url: this.host + "/models/" + modelname + "/permissions",
