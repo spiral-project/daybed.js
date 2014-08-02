@@ -32,8 +32,12 @@ function testModelSessionApi(done) {
                     "required": false}]
       }, [{"age": 42}]);
     })
-    .then(function getAgeModel(resp) {
+    .then(function getModels(resp) {
       done("Add model", resp);
+      return session.getModels();
+    })
+    .then(function getAgeModel(resp) {
+      done("Get models", resp);
       return session.getModel("age");
     })
     .then(function addRecord(resp) {

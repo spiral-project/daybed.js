@@ -84,6 +84,7 @@
 
     this.host = host;
     this.credentials = credentials;
+    this.credentials.algorithm = "sha256";
     this.options = options;
   }
 
@@ -92,6 +93,14 @@
       return request({
         method: "GET",
         url: this.host + "/",
+        credentials: this.credentials
+      });
+    },
+
+    getModels: function() {
+      return request({
+        method: "GET",
+        url: this.host + "/models",
         credentials: this.credentials
       });
     },
