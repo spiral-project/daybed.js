@@ -201,7 +201,7 @@
     addRecord: function(modelname, record) {
       var url, method;
 
-      if (!record.hasOwnProperty("id")) {
+      if (!record.hasOwnProperty("id") || !record.id) {
         method = "POST";
         url = this.host + "/models/" + modelname + "/records";
       } else {
