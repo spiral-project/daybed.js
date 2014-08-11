@@ -44,7 +44,7 @@
       if (options.body) {
         body = JSON.stringify(options.body);
       }
-      
+
       req.send(body);
     });
   }
@@ -81,10 +81,12 @@
         !credentials.hasOwnProperty("key") || credentials.key === undefined) {
       credentials = undefined;
     }
+    else {
+      credentials.algorithm = "sha256";
+    }
 
     this.host = host;
     this.credentials = credentials;
-    this.credentials.algorithm = "sha256";
     this.options = options;
   }
 
