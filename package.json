@@ -17,6 +17,8 @@
   "devDependencies": {
     "mocha": "1.21.*",
     "chai": "1.9.*",
-    "mocha-phantomjs": "3.5.*"
+    "sinon": "1.10.*",
+    "mocha-phantomjs": "3.5.*",
+    "promise-polyfill": "1.1.*"
   }
 }

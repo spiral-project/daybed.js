@@ -30,10 +30,10 @@
       }
       req.onload = function() {
         if (!("" + req.status).match(/^2/)) {
-          reject(req.response);
+          reject(new Error(req.responseText));
           return;
         }
-        resolve(req.response);
+        resolve(JSON.parse(req.responseText));
       };
 
       req.onerror = req.ontimeout = function(event) {
