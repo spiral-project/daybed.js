@@ -2,6 +2,9 @@
 
 A library to use Daybed easily.
 
+[![Build Status](https://travis-ci.org/spiral-project/daybed.js.png?branch=master)](https://travis-ci.org/spiral-project/daybed.js)
+
+
 ## Example
 
 Here is an example of how to use daybed in the context of a list of books you

@@ -30,10 +30,10 @@
       }
       req.onload = function() {
         if (!("" + req.status).match(/^2/)) {
-          reject(req.response);
+          reject(new Error(req.responseText));
           return;
         }
-        resolve(req.response);
+        resolve(JSON.parse(req.responseText));
       };
 
       req.onerror = req.ontimeout = function(event) {
@@ -44,7 +44,7 @@
       if (options.body) {
         body = JSON.stringify(options.body);
       }
-      
+
       req.send(body);
     });
   }
@@ -81,10 +81,12 @@
         !credentials.hasOwnProperty("key") || credentials.key === undefined) {
       credentials = undefined;
     }
+    else {
+      credentials.algorithm = "sha256";
+    }
 
     this.host = host;
     this.credentials = credentials;
-    this.credentials.algorithm = "sha256";
     this.options = options;
   }
 

@@ -7,5 +7,18 @@
   "repository": {
     "type": "git",
     "url": "git@github.com:spiral-project/daybed.js.git"
+  },
+  "scripts": {
+    "test": "make test"
+  },
+  "dependencies": {
+    "hawk": "2.2.*"
+  },
+  "devDependencies": {
+    "mocha": "1.21.*",
+    "chai": "1.9.*",
+    "sinon": "1.10.*",
+    "mocha-phantomjs": "3.5.*",
+    "promise-polyfill": "1.1.*"
   }
 }
