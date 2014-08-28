@@ -26,7 +26,7 @@
         var hawkHeader = hawk.client.header(options.url, options.method, {
           credentials: options.credentials
         });
-        req.setRequestHeader('authorization', hawkHeader.field);
+        req.setRequestHeader('Authorization', hawkHeader.field);
       }
       req.onload = function() {
         if (!("" + req.status).match(/^2/)) {
@@ -49,11 +49,39 @@
     });
   }
 
-  function getToken(daybedUrl) {
-    return request({
-      method: "POST",
-      url: daybedUrl + "/tokens"
-    });
+  function _credentials(credentials) {
+    // Returns credentials with default algorithm
+    if (credentials === undefined ||
+        !credentials.hasOwnProperty("id") || credentials.id === undefined ||
+        !credentials.hasOwnProperty("key") || credentials.key === undefined) {
+      credentials = undefined;
+    }
+    else {
+      credentials.algorithm = "sha256";
+    }
+    return credentials;
+  }
+
+  function getToken(host, credentials) {
+    credentials = _credentials(credentials);
+    if (credentials) {
+      return new Promise(function(resolve, reject) {
+        resolve(credentials);
+      });
+    }
+    else {
+      if (host === undefined) {
+        throw new Error("You should provide an host.");
+      }
+      // Create one
+      return request({
+        method: "POST",
+        url: host + "/tokens"
+      })
+      .then(function(resp) {
+        return resp.credentials;
+      });
+    }
   }
 
   function availableFields(host) {
@@ -75,18 +103,8 @@
     if (host === undefined) {
       throw new Error("You should provide an host.");
     }
-
-    if (credentials === undefined ||
-        !credentials.hasOwnProperty("id") || credentials.id === undefined ||
-        !credentials.hasOwnProperty("key") || credentials.key === undefined) {
-      credentials = undefined;
-    }
-    else {
-      credentials.algorithm = "sha256";
-    }
-
     this.host = host;
-    this.credentials = credentials;
+    this.credentials = _credentials(credentials);
     this.options = options;
   }
 
