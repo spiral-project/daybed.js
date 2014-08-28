@@ -3,6 +3,17 @@ var assert = chai.assert;
 
 describe('Daybed.Session', function() {
 
+    var server;
+    var session = new Daybed.Session('');
+
+    beforeEach(function () {
+        server = sinon.fakeServer.create();
+    });
+
+    afterEach(function () {
+        server.restore();
+    });
+
     describe('Initialization', function() {
 
         it("should fail if no host is specified", function() {
@@ -29,17 +40,6 @@ describe('Daybed.Session', function() {
 
     describe('Hello page', function() {
 
-        var server;
-        var session = new Daybed.Session('');
-
-        beforeEach(function () {
-            server = sinon.fakeServer.create();
-        });
-
-        afterEach(function () {
-            server.restore();
-        });
-
         it("should fetch hello from server", function (done) {
             server.respondWith("GET", "/", '{ "version": 1.0 }');
 
@@ -55,6 +55,20 @@ describe('Daybed.Session', function() {
 
             session.hello().catch(function (error) {
                 assert.equal(error.message, 'Server down');
+                done();
+            });
+            server.respond();
+        });
+    });
+
+
+    describe('Get models', function() {
+
+        it("should fetch models from server", function (done) {
+            server.respondWith("GET", "/models", '{ "models": [{ "title": "a" }] }');
+
+            session.getModels().then(function (data) {
+                assert.equal(data[0].title, 'a');
                 done();
             });
             server.respond();
