@@ -65,8 +65,9 @@
   function getToken(host, credentials) {
     credentials = _credentials(credentials);
     if (credentials) {
+      // TODO: check credentials are valid on server
       return new Promise(function(resolve, reject) {
-        resolve(credentials);
+        resolve({credentials: credentials});
       });
     }
     else {
@@ -77,9 +78,6 @@
       return request({
         method: "POST",
         url: host + "/tokens"
-      })
-      .then(function(resp) {
-        return resp.credentials;
       });
     }
   }

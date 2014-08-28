@@ -21,11 +21,11 @@ describe('Daybed.getToken', function() {
             }, Error, 'You should provide an host.');
         });
 
-        it.only("should requests a new one if no credentials are specified", function(done) {
+        it("should requests a new one if no credentials are specified", function(done) {
             server.respondWith("POST", "/tokens", '{ "credentials": { "id": 3.14 } }');
 
             Daybed.getToken('').then(function (data) {
-                assert.equal(data.id, 3.14);
+                assert.equal(data.credentials.id, 3.14);
                 done();
             });
             server.respond();
@@ -36,7 +36,7 @@ describe('Daybed.getToken', function() {
 
         it("should return credentials if those are specified correctly", function(done) {
             Daybed.getToken('', {id:1, key: 3}).then(function (data) {
-                assert.equal(data.id, 1);
+                assert.equal(data.credentials.id, 1);
                 done();
             });
         });
@@ -45,7 +45,7 @@ describe('Daybed.getToken', function() {
             server.respondWith("POST", "/tokens", '{ "credentials": { "id": 3.14 } }');
 
             Daybed.getToken('', {id: 1}).then(function (data) {
-                assert.equal(data.id, 3.14);
+                assert.equal(data.credentials.id, 3.14);
                 done();
             });
             server.respond();
