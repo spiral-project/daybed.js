@@ -36,7 +36,7 @@
           reject(new Error(req.responseText));
           return;
         }
-        resolve(JSON.parse(req.responseText));
+        resolve(req.response);
       };
 
       req.onerror = req.ontimeout = function(event) {
