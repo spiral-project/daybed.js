@@ -104,6 +104,9 @@
         method: "GET",
         url: this.host + "/models",
         credentials: this.credentials
+      })
+      .then(function(doc) {
+        return doc.models;
       });
     },
 
