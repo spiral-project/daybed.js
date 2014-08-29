@@ -66,6 +66,9 @@
   }
 
   function getToken(host, credentials) {
+    if (host === undefined) {
+      throw new Error("You should provide an host.");
+    }
     credentials = _credentials(credentials);
     if (credentials) {
       return request({
@@ -75,9 +78,6 @@
       });
     }
     else {
-      if (host === undefined) {
-        throw new Error("You should provide an host.");
-      }
       // Create one
       return request({
         method: "POST",
@@ -100,6 +100,26 @@
     });
   }
 
+  function startSession(host, options) {
+    options = options || {
+      credentials: undefined,
+      getToken: function() {}
+    };
+
+    var credentials = options.credentials;
+    var token = options.getToken();
+    if (!credentials && token) {
+      credentials = {id: token.slice(1), key: 'b'};
+    }
+
+    return getToken(host, credentials)
+    .catch(function () {
+      throw new Error(arguments);
+    })
+    .then(function (data) {
+      return new Session(host, credentials, options);
+    });
+  }
 
   function Session(host, credentials, options) {
     if (host === undefined) {
@@ -324,6 +344,7 @@
   var Daybed = {
     getToken: getToken,
     availableFields: availableFields,
+    startSession: startSession,
     spore: spore,
     Session: Session,
     Model: Model

@@ -1,6 +1,33 @@
 var assert = chai.assert;
 
 
+describe('Daybed.startSession', function() {
+
+    var server;
+
+    beforeEach(function () {
+        server = sinon.fakeServer.create();
+    });
+
+    afterEach(function () {
+        server.restore();
+    });
+
+    it("should fetch a token via a callback", function (done) {
+        server.respondWith("GET", "/token", '{ "credentials": { "id": 3.14 } }');
+
+        Daybed.startSession('', {
+            getToken: function () { return 'xyz'; },
+        }).then(function (session) {
+            assert.equal(session.credentials.id, 'yz');
+            done();
+        });
+
+        server.respond();
+    });
+});
+
+
 describe('Daybed.Session', function() {
 
     var server;
@@ -14,7 +41,7 @@ describe('Daybed.Session', function() {
         server.restore();
     });
 
-    describe('Initialization', function() {
+    describe('Raw initialization', function() {
 
         it("should fail if no host is specified", function() {
             assert.throws(function fn() {
