@@ -13,7 +13,7 @@ describe('Daybed.getToken', function() {
         server.restore();
     });
 
-    describe('Create by default', function() {
+    describe('Creation', function() {
 
         it("should fail if no host is specified", function() {
             assert.throws(function fn() {
@@ -30,21 +30,26 @@ describe('Daybed.getToken', function() {
             });
             server.respond();
         });
-    });
-
-    describe('Re-use if credentials provided', function() {
-
-        it("should return credentials if those are specified correctly", function(done) {
-            Daybed.getToken('', {id:1, key: 3}).then(function (data) {
-                assert.equal(data.credentials.id, 1);
-                done();
-            });
-        });
 
         it("should requests a new one if credentials are incomplete", function(done) {
             server.respondWith("POST", "/tokens", '{ "credentials": { "id": 3.14 } }');
 
             Daybed.getToken('', {id: 1}).then(function (data) {
+                assert.equal(data.credentials.id, 3.14);
+                done();
+            });
+            server.respond();
+        });
+    });
+
+    describe('Validation', function() {
+
+        it("should validate credentials on server if specified correctly", function(done) {
+            server.respondWith("GET", "/token", '{ "credentials": { "id": 3.14 } }');
+
+            Daybed.getToken('', {id: 3.14, key: 3}).catch(function() {
+                console.log(arguments);
+            }).then(function (data) {
                 assert.equal(data.credentials.id, 3.14);
                 done();
             });

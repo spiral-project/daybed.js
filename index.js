@@ -23,10 +23,13 @@
       }
 
       if (options.credentials) {
-        var hawkHeader = hawk.client.header(options.url, options.method, {
-          credentials: options.credentials
-        });
-        req.setRequestHeader('Authorization', hawkHeader.field);
+        try {
+          var hawkHeader = hawk.client.header(options.url, options.method, {
+            credentials: options.credentials
+          });
+          req.setRequestHeader('Authorization', hawkHeader.field);
+        }
+        catch (e) {}
       }
       req.onload = function() {
         if (!("" + req.status).match(/^2/)) {
@@ -65,9 +68,10 @@
   function getToken(host, credentials) {
     credentials = _credentials(credentials);
     if (credentials) {
-      // TODO: check credentials are valid on server
-      return new Promise(function(resolve, reject) {
-        resolve({credentials: credentials});
+      return request({
+        method: "GET",
+        url: host + "/token",
+        credentials: credentials
       });
     }
     else {
