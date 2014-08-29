@@ -103,13 +103,16 @@
   function startSession(host, options) {
     options = options || {
       credentials: undefined,
-      getToken: function() {}
+      getToken: undefined
     };
 
     var credentials = options.credentials;
-    var token = options.getToken();
+    var token = options.getToken && options.getToken();
     if (!credentials && token) {
-      credentials = {id: token.slice(1), key: 'b'};
+
+      deriveHawkCredentials(token, 'sessionToken', 32*2, function (creds) {
+        credentials = creds;
+      });
     }
 
     return getToken(host, credentials)
@@ -117,7 +120,7 @@
       throw new Error(arguments);
     })
     .then(function (data) {
-      return new Session(host, credentials, options);
+      return new Session(host, data.credentials, options);
     });
   }
 

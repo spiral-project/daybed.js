@@ -13,13 +13,37 @@ describe('Daybed.startSession', function() {
         server.restore();
     });
 
-    it("should fetch a token via a callback", function (done) {
-        server.respondWith("GET", "/token", '{ "credentials": { "id": 3.14 } }');
+    it("should create a new token if no credentials", function (done) {
+        server.respondWith("POST", "/tokens", '{ "credentials": { "id": 3.14, "key": "abc" } }');
+
+        Daybed.startSession('').then(function (session) {
+            assert.equal(session.credentials.id, 3.14);
+            done();
+        });
+
+        server.respond();
+    });
+
+    it("should validate credentials if specified", function (done) {
+        server.respondWith("GET", "/token", '{ "credentials": { "id": 3.14, "key": "abc" } }');
+
+        Daybed.startSession('', {
+            credentials: {id: 'a', key: 'xyz'},
+        }).then(function (session) {
+            assert.equal(session.credentials.id, '3.14');
+            done();
+        });
+
+        server.respond();
+    });
+
+    it("should derive the token if specified via option", function (done) {
+        server.respondWith("GET", "/token", '{ "credentials": { "id": 3.14, "key": "abc" } }');
 
         Daybed.startSession('', {
             getToken: function () { return 'xyz'; },
         }).then(function (session) {
-            assert.equal(session.credentials.id, 'yz');
+            assert.equal(session.credentials.algorithm, 'sha256');
             done();
         });
 
