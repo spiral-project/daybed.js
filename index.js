@@ -97,7 +97,14 @@
     }
   }
 
-  function availableFields(host) {
+  function hello(host) {
+    return request({
+      method: "GET",
+      url: host + "/"
+    });
+  }
+
+  function fields(host) {
     return request({
       method: "GET",
       url: host + "/fields"
@@ -147,12 +154,17 @@
   }
 
   Session.prototype = {
-    hello: function() {
-      return request({
-        method: "GET",
-        url: this.host + "/",
-        credentials: this.credentials
-      });
+
+    hello: function () {
+      return hello(this.host);
+    },
+
+    fields: function () {
+      return fields(this.host);
+    },
+
+    spore: function () {
+      return spore(this.host);
     },
 
     getModels: function() {
@@ -359,7 +371,8 @@
 
   var Daybed = {
     getToken: getToken,
-    availableFields: availableFields,
+    hello: hello,
+    fields: fields,
     startSession: startSession,
     spore: spore,
     Session: Session,

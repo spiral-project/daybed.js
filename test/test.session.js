@@ -89,30 +89,6 @@ describe('Daybed.Session', function() {
         });
     });
 
-    describe('Hello page', function() {
-
-        it("should fetch hello from server", function (done) {
-            server.respondWith("GET", "/", '{ "version": 1.0 }');
-
-            session.hello().then(function (data) {
-                assert.equal(data.version, 1.0);
-                done();
-            });
-            server.respond();
-        });
-
-        it("should survive server errors", function (done) {
-            server.respondWith("GET", "/", [500, '', 'Server down']);
-
-            session.hello().catch(function (error) {
-                assert.equal(error.message, 'Server down');
-                done();
-            });
-            server.respond();
-        });
-    });
-
-
     describe('Get models', function() {
 
         it("should fetch models from server", function (done) {
