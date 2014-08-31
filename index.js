@@ -63,7 +63,24 @@
     });
   }
 
-  function _credentials(credentials) {
+  function _credentials(hawkinfo) {
+    var hawkinfo = hawkinfo || {
+      credentials: undefined,
+      token: undefined
+    };
+
+    // token can be a function
+    var credentials = hawkinfo.credentials;
+    var token = typeof(hawkinfo.token) == 'function' ? hawkinfo.token()
+                                                     : hawkinfo.token;
+
+    // Derive credentials with hdfk
+    if (!credentials && token) {
+      deriveHawkCredentials(token, 'sessionToken', 32*2, function (creds) {
+        credentials = creds;
+      });
+    }
+
     // Returns credentials with default algorithm
     if (credentials === undefined ||
         !credentials.hasOwnProperty("id") || credentials.id === undefined ||
@@ -76,12 +93,14 @@
     return credentials;
   }
 
-  function getToken(host, credentials) {
+  function getToken(host, options) {
     if (host === undefined) {
       throw new Error("You should provide an host.");
     }
-    credentials = _credentials(credentials);
+    var credentials = _credentials(options);
+
     if (credentials) {
+      // Check provided credentials
       return request({
         method: "GET",
         url: host + "/token",
@@ -89,7 +108,7 @@
       });
     }
     else {
-      // Create one
+      // Create new credentials
       return request({
         method: "POST",
         url: host + "/tokens"
@@ -119,38 +138,28 @@
   }
 
   function startSession(host, options) {
-    options = options || {
-      credentials: undefined,
-      getToken: undefined
-    };
+    options = options || {};
 
-    var credentials = options.credentials;
-    var token = options.getToken && options.getToken();
+    var credentials = _credentials(options);
 
-    if (!credentials && token) {
-      deriveHawkCredentials(token, 'sessionToken', 32*2, function (creds) {
-        credentials = creds;
-      });
-    }
-
-    return getToken(host, credentials)
-    .catch(function () {
-      throw new Error(arguments);
-    })
+    return getToken(host, {credentials: credentials})
     .then(function (data) {
-      return new Session(host, data.credentials, {token: data.token});
+      return new Session(host, data);
+    })
+    .catch(function (error) {
+      throw error;
     });
   }
 
-  function Session(host, credentials, options) {
+  function Session(host, options) {
     options = options || {};
     if (host === undefined) {
       throw new Error("You should provide an host.");
     }
     this.host = host;
-    this.token = options.token;
-    this.credentials = _credentials(credentials);
     this.options = options;
+    this.token = options.token;
+    this.credentials = _credentials(options);
   }
 
   Session.prototype = {

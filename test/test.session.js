@@ -37,11 +37,11 @@ describe('Daybed.startSession', function() {
         server.respond();
     });
 
-    it("should derive the token if specified via option", function (done) {
+    it("should derive the token if specified", function (done) {
         server.respondWith("GET", "/token", '{ "credentials": { "id": 3.14, "key": "abc" } }');
 
         Daybed.startSession('', {
-            getToken: function () { return 'xyz'; },
+            token: function () { return 'xyz'; },
         }).then(function (session) {
             assert.equal(session.credentials.algorithm, 'sha256');
             done();
@@ -79,12 +79,12 @@ describe('Daybed.Session', function() {
         });
 
         it("should ignore credentials if not well formed", function() {
-            var session = new Daybed.Session('host', {id: ''});
+            var session = new Daybed.Session('host', {credentials: {id: ''}});
             assert.isUndefined(session.credentials);
         });
 
         it("should have default algorithm", function() {
-            var session = new Daybed.Session('host', {id: '', key: ''});
+            var session = new Daybed.Session('host', {credentials: {id: '', key: ''}});
             assert.equal(session.credentials.algorithm, 'sha256');
         });
     });
