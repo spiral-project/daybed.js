@@ -41,6 +41,19 @@ describe('Daybed.startSession', function() {
         server.respondWith("GET", "/token", '{ "credentials": { "id": 3.14, "key": "abc" } }');
 
         Daybed.startSession('', {
+            token: 'xyz'
+        }).then(function (session) {
+            assert.equal(session.credentials.algorithm, 'sha256');
+            done();
+        });
+
+        server.respond();
+    });
+
+    it("should derive the token if specified as function", function (done) {
+        server.respondWith("GET", "/token", '{ "credentials": { "id": 3.14, "key": "abc" } }');
+
+        Daybed.startSession('', {
             token: function () { return 'xyz'; },
         }).then(function (session) {
             assert.equal(session.credentials.algorithm, 'sha256');
