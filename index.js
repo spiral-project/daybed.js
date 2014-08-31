@@ -16,7 +16,6 @@
       req.setRequestHeader('Accept', 'application/json');
       req.responseType = 'json';
       req.timeout = TIMEOUT;
-      // req.withCredentials = true;
 
       if (options.validateOnly) {
         req.setRequestHeader('Validate-Only', 'true');
@@ -31,23 +30,38 @@
         }
         catch (e) {}
       }
+
       req.onload = function() {
+        // With some browsers, read responseText.
+        // On some server error, maybed no JSON.
+        var response = req.response;
+        if (response === undefined) {
+          try {
+            response = JSON.parse(req.responseText);
+          }
+          catch (e) {
+            response = req.responseText;
+          }
+        }
+
+        // Error bad status
         if (!("" + req.status).match(/^2/)) {
-          reject(new Error(req.responseText));
+          reject(new Error(response));
           return;
         }
-        resolve(req.response);
+        // Success
+        resolve(response);
       };
 
       req.onerror = req.ontimeout = function(event) {
-        reject(event.target.status);
+        reject(new Error(event.target.status));
       };
 
+      // Run request
       var body;
       if (options.body) {
         body = JSON.stringify(options.body);
       }
-
       req.send(body);
     });
   }
