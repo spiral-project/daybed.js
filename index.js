@@ -22,13 +22,10 @@
       }
 
       if (options.credentials) {
-        try {
-          var hawkHeader = hawk.client.header(options.url, options.method, {
-            credentials: options.credentials
-          });
-          req.setRequestHeader('Authorization', hawkHeader.field);
-        }
-        catch (e) {}
+        var hawkHeader = hawk.client.header(options.url, options.method, {
+          credentials: options.credentials
+        });
+        req.setRequestHeader('Authorization', hawkHeader.field);
       }
 
       req.onload = function() {
