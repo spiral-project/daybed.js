@@ -30,7 +30,7 @@
 
       req.onload = function() {
         // With some browsers, read responseText.
-        // On some server error, maybed no JSON.
+        // On some server error, response can be JSON.
         var response = req.response;
         if (response === undefined) {
           try {
