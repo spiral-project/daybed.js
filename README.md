@@ -56,3 +56,7 @@ you can just reuse it without having to define it in your code:
 
     var books = new RemoteModel('books', session);
     books.all()
+    
+# References
+
+* [Promises error handling](http://www.html5rocks.com/en/tutorials/es6/promises/#toc-error-handling)
