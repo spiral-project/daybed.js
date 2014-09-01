@@ -83,7 +83,7 @@ describe('Daybed.Session', function() {
         it("should fail if no host is specified", function() {
             assert.throws(function fn() {
                 new Daybed.Session();
-            }, Error, 'You should provide an host.');
+            }, Error, 'You should provide a host.');
         });
 
         it("should have undefined credentials if not specified", function() {

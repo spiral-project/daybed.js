@@ -95,7 +95,7 @@
 
   function getToken(host, options) {
     if (host === undefined) {
-      throw new Error("You should provide an host.");
+      throw new Error("You should provide a host.");
     }
     var credentials = _credentials(options);
 
@@ -154,7 +154,7 @@
   function Session(host, options) {
     options = options || {};
     if (host === undefined) {
-      throw new Error("You should provide an host.");
+      throw new Error("You should provide a host.");
     }
     this.host = host;
     this.options = options;

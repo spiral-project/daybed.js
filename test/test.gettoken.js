@@ -18,7 +18,7 @@ describe('Daybed.getToken', function() {
         it("should fail if no host is specified", function() {
             assert.throws(function fn() {
                 Daybed.getToken();
-            }, Error, 'You should provide an host.');
+            }, Error, 'You should provide a host.');
         });
 
         it("should requests a new one if no credentials are specified", function(done) {
