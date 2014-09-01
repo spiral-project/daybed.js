@@ -64,7 +64,7 @@
   }
 
   function _credentials(hawkinfo) {
-    var hawkinfo = hawkinfo || {
+    hawkinfo = hawkinfo || {
       credentials: undefined,
       token: undefined
     };
@@ -348,17 +348,11 @@
 
   Model.prototype = {
     load: function() {
-      var self = this;
-      return new Promise(function(resolve, reject) {
-        self.session.getModel(self.modelname).then(function(resp) {
-          console.debug(self._definition, "has been replaced by", resp.definition);
-          console.debug(self._records, "has been replaced by", resp.records);
-
+      return this.session.getModel(this.modelname)
+        .then(function (resp) {
           self._definition = resp.definition;
           self._records = resp.records;
-          resolve();
-        }).catch(reject);
-      });
+        });
     },
     add: function(record) {
       this._records.push(record);
