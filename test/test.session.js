@@ -1,6 +1,70 @@
 var assert = chai.assert;
 
 
+describe('Daybed.startSession', function() {
+
+    var server;
+
+    beforeEach(function () {
+        server = sinon.fakeServer.create();
+    });
+
+    afterEach(function () {
+        server.restore();
+    });
+
+    it("should create a new token if no credentials", function (done) {
+        server.respondWith("POST", "/tokens", '{ "credentials": { "id": 3.14, "key": "abc" } }');
+
+        Daybed.startSession('').then(function (session) {
+            assert.equal(session.credentials.id, 3.14);
+            done();
+        });
+
+        server.respond();
+    });
+
+    it("should validate credentials if specified", function (done) {
+        server.respondWith("GET", "/token", '{ "credentials": { "id": 3.14, "key": "abc" } }');
+
+        Daybed.startSession('', {
+            credentials: {id: 'a', key: 'xyz'},
+        }).then(function (session) {
+            assert.equal(session.credentials.id, '3.14');
+            done();
+        });
+
+        server.respond();
+    });
+
+    it("should derive the token if specified", function (done) {
+        server.respondWith("GET", "/token", '{ "credentials": { "id": 3.14, "key": "abc" } }');
+
+        Daybed.startSession('', {
+            token: 'xyz'
+        }).then(function (session) {
+            assert.equal(session.credentials.algorithm, 'sha256');
+            done();
+        });
+
+        server.respond();
+    });
+
+    it("should derive the token if specified as function", function (done) {
+        server.respondWith("GET", "/token", '{ "credentials": { "id": 3.14, "key": "abc" } }');
+
+        Daybed.startSession('', {
+            token: function () { return 'xyz'; },
+        }).then(function (session) {
+            assert.equal(session.credentials.algorithm, 'sha256');
+            done();
+        });
+
+        server.respond();
+    });
+});
+
+
 describe('Daybed.Session', function() {
 
     var server;
@@ -14,12 +78,12 @@ describe('Daybed.Session', function() {
         server.restore();
     });
 
-    describe('Initialization', function() {
+    describe('Raw initialization', function() {
 
         it("should fail if no host is specified", function() {
             assert.throws(function fn() {
                 new Daybed.Session();
-            }, Error, 'You should provide an host.');
+            }, Error, 'You should provide a host.');
         });
 
         it("should have undefined credentials if not specified", function() {
@@ -28,39 +92,15 @@ describe('Daybed.Session', function() {
         });
 
         it("should ignore credentials if not well formed", function() {
-            var session = new Daybed.Session('host', {id: ''});
+            var session = new Daybed.Session('host', {credentials: {id: ''}});
             assert.isUndefined(session.credentials);
         });
 
         it("should have default algorithm", function() {
-            var session = new Daybed.Session('host', {id: '', key: ''});
+            var session = new Daybed.Session('host', {credentials: {id: '', key: ''}});
             assert.equal(session.credentials.algorithm, 'sha256');
         });
     });
-
-    describe('Hello page', function() {
-
-        it("should fetch hello from server", function (done) {
-            server.respondWith("GET", "/", '{ "version": 1.0 }');
-
-            session.hello().then(function (data) {
-                assert.equal(data.version, 1.0);
-                done();
-            });
-            server.respond();
-        });
-
-        it("should survive server errors", function (done) {
-            server.respondWith("GET", "/", [500, '', 'Server down']);
-
-            session.hello().catch(function (error) {
-                assert.equal(error.message, 'Server down');
-                done();
-            });
-            server.respond();
-        });
-    });
-
 
     describe('Get models', function() {
 

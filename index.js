@@ -16,7 +16,6 @@
       req.setRequestHeader('Accept', 'application/json');
       req.responseType = 'json';
       req.timeout = TIMEOUT;
-      // req.withCredentials = true;
 
       if (options.validateOnly) {
         req.setRequestHeader('Validate-Only', 'true');
@@ -26,37 +25,105 @@
         var hawkHeader = hawk.client.header(options.url, options.method, {
           credentials: options.credentials
         });
-        req.setRequestHeader('authorization', hawkHeader.field);
+        req.setRequestHeader('Authorization', hawkHeader.field);
       }
+
       req.onload = function() {
+        // With some browsers, read responseText.
+        // On some server error, response can be JSON.
+        var response = req.response;
+        if (response === undefined) {
+          try {
+            response = JSON.parse(req.responseText);
+          }
+          catch (e) {
+            response = req.responseText;
+          }
+        }
+
+        // Error bad status
         if (!("" + req.status).match(/^2/)) {
-          reject(new Error(req.responseText));
+          reject(new Error(response), req);
           return;
         }
-        resolve(JSON.parse(req.responseText));
+        // Success
+        resolve(response);
       };
 
       req.onerror = req.ontimeout = function(event) {
-        reject(event.target.status);
+        reject(new Error(event.target.status), req);
       };
 
+      // Run request
       var body;
       if (options.body) {
         body = JSON.stringify(options.body);
       }
-
       req.send(body);
     });
   }
 
-  function getToken(daybedUrl) {
+  function _credentials(hawkinfo) {
+    hawkinfo = hawkinfo || {
+      credentials: undefined,
+      token: undefined
+    };
+
+    // token can be a function
+    var credentials = hawkinfo.credentials;
+    var token = typeof(hawkinfo.token) == 'function' ? hawkinfo.token()
+                                                     : hawkinfo.token;
+
+    // Derive credentials with hdfk
+    if (!credentials && token) {
+      deriveHawkCredentials(token, 'sessionToken', 32*2, function (creds) {
+        credentials = creds;
+      });
+    }
+
+    // Returns credentials with default algorithm
+    if (credentials === undefined ||
+        !credentials.hasOwnProperty("id") || credentials.id === undefined ||
+        !credentials.hasOwnProperty("key") || credentials.key === undefined) {
+      credentials = undefined;
+    }
+    else {
+      credentials.algorithm = "sha256";
+    }
+    return credentials;
+  }
+
+  function getToken(host, options) {
+    if (host === undefined) {
+      throw new Error("You should provide a host.");
+    }
+    var credentials = _credentials(options);
+
+    if (credentials) {
+      // Check provided credentials
+      return request({
+        method: "GET",
+        url: host + "/token",
+        credentials: credentials
+      });
+    }
+    else {
+      // Create new credentials
+      return request({
+        method: "POST",
+        url: host + "/tokens"
+      });
+    }
+  }
+
+  function hello(host) {
     return request({
-      method: "POST",
-      url: daybedUrl + "/tokens"
+      method: "GET",
+      url: host + "/"
     });
   }
 
-  function availableFields(host) {
+  function fields(host) {
     return request({
       method: "GET",
       url: host + "/fields"
@@ -70,33 +137,43 @@
     });
   }
 
+  function startSession(host, options) {
+    options = options || {};
 
-  function Session(host, credentials, options) {
+    var credentials = _credentials(options);
+
+    return getToken(host, {credentials: credentials})
+    .then(function (data) {
+      return new Session(host, data);
+    })
+    .catch(function (error) {
+      throw error;
+    });
+  }
+
+  function Session(host, options) {
+    options = options || {};
     if (host === undefined) {
-      throw new Error("You should provide an host.");
+      throw new Error("You should provide a host.");
     }
-
-    if (credentials === undefined ||
-        !credentials.hasOwnProperty("id") || credentials.id === undefined ||
-        !credentials.hasOwnProperty("key") || credentials.key === undefined) {
-      credentials = undefined;
-    }
-    else {
-      credentials.algorithm = "sha256";
-    }
-
     this.host = host;
-    this.credentials = credentials;
     this.options = options;
+    this.token = options.token;
+    this.credentials = _credentials(options);
   }
 
   Session.prototype = {
-    hello: function() {
-      return request({
-        method: "GET",
-        url: this.host + "/",
-        credentials: this.credentials
-      });
+
+    hello: function () {
+      return hello(this.host);
+    },
+
+    fields: function () {
+      return fields(this.host);
+    },
+
+    spore: function () {
+      return spore(this.host);
     },
 
     getModels: function() {
@@ -271,17 +348,11 @@
 
   Model.prototype = {
     load: function() {
-      var self = this;
-      return new Promise(function(resolve, reject) {
-        self.session.getModel(self.modelname).then(function(resp) {
-          console.debug(self._definition, "has been replaced by", resp.definition);
-          console.debug(self._records, "has been replaced by", resp.records);
-
+      return this.session.getModel(this.modelname)
+        .then(function (resp) {
           self._definition = resp.definition;
           self._records = resp.records;
-          resolve();
-        }).catch(reject);
-      });
+        });
     },
     add: function(record) {
       this._records.push(record);
@@ -303,7 +374,9 @@
 
   var Daybed = {
     getToken: getToken,
-    availableFields: availableFields,
+    hello: hello,
+    fields: fields,
+    startSession: startSession,
     spore: spore,
     Session: Session,
     Model: Model
