@@ -37,21 +37,26 @@
             response = JSON.parse(req.responseText);
           }
           catch (e) {
+            console.warn("Could not parse response as JSON");
             response = req.responseText;
           }
         }
-
         // Error bad status
         if (!("" + req.status).match(/^2/)) {
-          reject(new Error(response), req);
+          var error = new Error(response);
+          console.error(error);
+          reject(error, req);
           return;
         }
+
         // Success
         resolve(response);
       };
 
       req.onerror = req.ontimeout = function(event) {
-        reject(new Error(event.target.status), req);
+        var error = new Error(event.target.status);
+        console.error(error);
+        reject(error, req);
       };
 
       // Run request
@@ -187,15 +192,20 @@
       });
     },
 
-    addModel: function(modelname, definition, records) {
+    loadModel: function(modelId) {
+      var model = new Model({id: modelId, session: this});
+      return model.load();
+    },
+
+    addModel: function(modelId, definition, records) {
       var url, method;
 
-      if (modelname === undefined) {
+      if (modelId === undefined) {
         method = "POST";
         url = this.host + "/models";
       } else {
         method = "PUT";
-        url = this.host + "/models/" + modelname;
+        url = this.host + "/models/" + modelId;
       }
 
       return request({
@@ -206,89 +216,89 @@
       });
     },
 
-    getModel: function(modelname) {
+    getModel: function(modelId) {
       return request({
         method: "GET",
-        url: this.host + "/models/" + modelname,
+        url: this.host + "/models/" + modelId,
         credentials: this.credentials
       });
     },
 
-    deleteModel: function(modelname) {
+    deleteModel: function(modelId) {
       return request({
         method: "DELETE",
-        url: this.host + "/models/" + modelname,
+        url: this.host + "/models/" + modelId,
         credentials: this.credentials
       });
     },
 
-    getDefinition: function(modelname) {
+    getDefinition: function(modelId) {
       return request({
         method: "GET",
-        url: this.host + "/models/" + modelname + "/definition",
+        url: this.host + "/models/" + modelId + "/definition",
         credentials: this.credentials
       });
     },
 
-    getPermissions: function(modelname) {
+    getPermissions: function(modelId) {
       return request({
         method: "GET",
-        url: this.host + "/models/" + modelname + "/permissions",
+        url: this.host + "/models/" + modelId + "/permissions",
         credentials: this.credentials
       });
     },
 
-    putPermissions: function(modelname, permissions) {
+    putPermissions: function(modelId, permissions) {
       return request({
         method: "PUT",
-        url: this.host + "/models/" + modelname + "/permissions",
+        url: this.host + "/models/" + modelId + "/permissions",
         body: permissions,
         credentials: this.credentials
       });
     },
 
-    patchPermissions: function(modelname, rules) {
+    patchPermissions: function(modelId, rules) {
       return request({
         method: "PATCH",
-        url: this.host + "/models/" + modelname + "/permissions",
+        url: this.host + "/models/" + modelId + "/permissions",
         body: rules,
         credentials: this.credentials
       });
     },
 
-    getRecords: function(modelname) {
+    getRecords: function(modelId) {
       return request({
         method: "GET",
-        url: this.host + "/models/" + modelname + "/records",
+        url: this.host + "/models/" + modelId + "/records",
         credentials: this.credentials
       });
     },
 
-    deleteRecords: function(modelname) {
+    deleteRecords: function(modelId) {
       return request({
         method: "DELETE",
-        url: this.host + "/models/" + modelname + "/records",
+        url: this.host + "/models/" + modelId + "/records",
         credentials: this.credentials
       });
     },
 
-    getRecord: function(modelname, recordId) {
+    getRecord: function(modelId, recordId) {
       return request({
         method: "GET",
-        url: this.host + "/models/" + modelname + "/records/" + recordId,
+        url: this.host + "/models/" + modelId + "/records/" + recordId,
         credentials: this.credentials
       });
     },
 
-    addRecord: function(modelname, record) {
+    addRecord: function(modelId, record) {
       var url, method;
 
       if (!record.hasOwnProperty("id") || !record.id) {
         method = "POST";
-        url = this.host + "/models/" + modelname + "/records";
+        url = this.host + "/models/" + modelId + "/records";
       } else {
         method = "PUT";
-        url = this.host + "/models/" + modelname + "/records/" + record.id;
+        url = this.host + "/models/" + modelId + "/records/" + record.id;
       }
 
       return request({
@@ -299,15 +309,15 @@
       });
     },
 
-    validateRecord: function(modelname, record) {
+    validateRecord: function(modelId, record) {
       var url, method;
 
       if (!record.hasOwnProperty("id")) {
         method = "POST";
-        url = this.host + "/models/" + modelname + "/records";
+        url = this.host + "/models/" + modelId + "/records";
       } else {
         method = "PUT";
-        url = this.host + "/models/" + modelname + "/records/" + record.id;
+        url = this.host + "/models/" + modelId + "/records/" + record.id;
       }
 
       return request({
@@ -319,55 +329,79 @@
       });
     },
 
-    patchRecord: function(modelname, recordId, patch) {
+    patchRecord: function(modelId, recordId, patch) {
       return request({
         method: "PATCH",
-        url: this.host + "/models/" + modelname + "/records/" + recordId,
+        url: this.host + "/models/" + modelId + "/records/" + recordId,
         body: patch,
         credentials: this.credentials
       });
     },
 
-    deleteRecord: function(modelname, recordId) {
+    deleteRecord: function(modelId, recordId) {
       return request({
         method: "DELETE",
-        url: this.host + "/models/" + modelname + "/records/" + recordId,
+        url: this.host + "/models/" + modelId + "/records/" + recordId,
         credentials: this.credentials
       });
     }
   };
 
 
-  function Model(session, modelname, definition, records) {
-    this.session = session;
-    this.modelname = modelname;
+  function Model(options) {
+    options = options || {};
+    this.id = options.id;
+    this.session = options.session;
 
-    this._definition = definition;
-    this._records = records || [];
+    this._definition = options.definition;
+    this._records = options.records || [];
   }
 
   Model.prototype = {
-    load: function() {
-      return this.session.getModel(this.modelname)
-        .then(function (resp) {
-          self._definition = resp.definition;
-          self._records = resp.records;
-        });
-    },
+
     add: function(record) {
       this._records.push(record);
     },
+
     definition: function() {
       return this._definition;
     },
+
     records: function() {
       return this._records;
     },
-    save: function() {
-      return this.session.addModel(this.modelname, this._definition, this._records);
+
+    load: function(options) {
+      var self = this;
+      options = options || {};
+      self.session = options.session || self.session;
+      self.id = options.id || self.id;
+
+      return self.session.getModel(self.id)
+        .then(function (resp) {
+          self._definition = resp.definition;
+          self._records = resp.records;
+          return self;
+        });
     },
-    delete: function() {
-      return this.session.deleteModel(this.modelname);
+
+    save: function(options) {
+      options = options || {};
+      this.session = options.session || this.session;
+      var modelId = options.id || this.id;
+
+      var self = this;
+      return this.session.addModel(modelId, this._definition, this._records)
+        .then(function(resp) {
+          self.id = resp.id;
+          return self;
+        });
+    },
+
+    delete: function(options) {
+      options = options || {};
+      this.session = options.session || this.session;
+      return session.deleteModel(this.id);
     }
   };
 
