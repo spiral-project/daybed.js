@@ -29,4 +29,19 @@ describe('Daybed.Model', function() {
 
         server.respond();
     });
+
+    it("can be defined from scratch and bound to session", function (done) {
+        server.respondWith("PUT", "/models/pouet", '{"id": "pouet"}');
+
+        var session = new Daybed.Session('');
+        var model = new Daybed.Model();
+        model.save({id: 'pouet', session: session})
+             .then(function () {
+                assert.equal(model.id, 'pouet');
+                assert.equal(model.session, session);
+                done();
+             });
+
+        server.respond();
+    });
 });
