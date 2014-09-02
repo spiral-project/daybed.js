@@ -377,22 +377,26 @@
       this.session = options.session || this.session;
       this.id = options.id || this.id;
 
+      var self = this;
       return this.session.getModel(this.id)
         .then(function (resp) {
-          this._definition = resp.definition;
-          this._records = resp.records;
-          return this;
-        }.bind(this));
+          self._definition = resp.definition;
+          self._records = resp.records;
+          return self;
+        });
     },
 
     save: function(options) {
       options = options || {};
       this.session = options.session || this.session;
       var modelId = options.id || this.id;
+
+      var self = this;
       return this.session.addModel(modelId, this._definition, this._records)
         .then(function(resp) {
-          this.id = resp.id;
-        }.bind(this));
+          self.id = resp.id;
+          return self;
+        });
     },
 
     delete: function(options) {

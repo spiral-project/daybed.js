@@ -14,11 +14,11 @@ describe('Daybed.Model', function() {
     });
 
     it("should fetch definition and records from server", function (done) {
-        server.respondWith("GET", "/token", '{ "credentials": { "id": 3.14, "key": "abc" } }');
-        server.respondWith("GET", "/model/test", '{ "records": [{"status": "done"}], "definition": {"fields": "fff"}}');
+        server.respondWith("GET", "/token", '{ "credentials": { "id": "abc", "key": "xyz" } }');
+        server.respondWith("PUT", "/models/test", '{ "id": "test", "records": [{"status": "done"}], "definition": {"fields": "fff"}}');
 
-        Daybed.startSession('').then(function (session) {
-            var model = new Model({session: session});
+        Daybed.startSession('', {token: "abc"}).then(function (session) {
+            var model = new Daybed.Model({session: session});
             model.load()
               .then(function () {
                 assert.equal(model.records()[0].status, 'done');
