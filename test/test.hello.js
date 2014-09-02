@@ -15,7 +15,7 @@ describe('Hello page', function() {
     });
 
     it("should fetch hello from server", function (done) {
-        server.respondWith("GET", "/", '{ "version": 1.0 }');
+        server.respondWith("GET", "/v1/", '{ "version": 1.0 }');
 
         Daybed.hello('').then(function (data) {
             assert.equal(data.version, 1.0);
@@ -25,7 +25,7 @@ describe('Hello page', function() {
     });
 
     it("should survive server errors", function (done) {
-        server.respondWith("GET", "/", [500, '', 'Server down']);
+        server.respondWith("GET", "/v1/", [500, '', 'Server down']);
 
         sandbox.stub(console, 'warn');
         sandbox.stub(console, 'error');
