@@ -41,7 +41,6 @@
             response = req.responseText;
           }
         }
-
         // Error bad status
         if (!("" + req.status).match(/^2/)) {
           var error = new Error(response);
@@ -373,12 +372,12 @@
     },
 
     load: function(options) {
-      options = options || {};
-      this.session = options.session || this.session;
-      this.id = options.id || this.id;
-
       var self = this;
-      return this.session.getModel(this.id)
+      options = options || {};
+      self.session = options.session || self.session;
+      self.id = options.id || self.id;
+
+      return self.session.getModel(self.id)
         .then(function (resp) {
           self._definition = resp.definition;
           self._records = resp.records;
