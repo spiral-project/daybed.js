@@ -185,16 +185,14 @@ You can also create new ones and assign them to specific permissions:
 ```javascript
 
     Daybed.getToken()
-          .then(addDeletePermissions);
-
-    function addDeletePermissions(credentials) {
+          .then(function(credentials) {
       var token = credentials.token;
       console.log(token + ' will be allowed to delete any record');
 
       var permissions = {};
       permissions[token] = ['delete_all_records'];
       session.patchPermissions(modelId, permissions);
-    }
+    });
 
 ```
 
