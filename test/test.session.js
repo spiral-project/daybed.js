@@ -114,4 +114,18 @@ describe('Daybed.Session', function() {
             server.respond();
         });
     });
+
+
+    describe('Load models', function() {
+
+        it("should fetch single model from server", function (done) {
+            server.respondWith("GET", "/models/test", '{ "definition": { "title": "Test" } }');
+
+            session.loadModel('test').then(function (model) {
+                assert.equal(model.definition().title, 'Test');
+                done();
+            });
+            server.respond();
+        });
+    });
 });

@@ -193,6 +193,11 @@
       });
     },
 
+    loadModel: function(modelId) {
+      var model = new Model({id: modelId, session: this});
+      return model.load();
+    },
+
     addModel: function(modelId, definition, records) {
       var url, method;
 
@@ -344,36 +349,56 @@
   };
 
 
-  function Model(session, modelname, definition, records) {
-    this.session = session;
-    this.modelname = modelname;
+  function Model(options) {
+    options = options || {};
+    this.id = options.id;
+    this.session = options.session;
 
-    this._definition = definition;
-    this._records = records || [];
+    this._definition = options.definition;
+    this._records = options.records || [];
   }
 
   Model.prototype = {
-    load: function() {
-      return this.session.getModel(this.modelname)
-        .then(function (resp) {
-          self._definition = resp.definition;
-          self._records = resp.records;
-        });
-    },
+
     add: function(record) {
       this._records.push(record);
     },
+
     definition: function() {
       return this._definition;
     },
+
     records: function() {
       return this._records;
     },
-    save: function() {
-      return this.session.addModel(this.modelname, this._definition, this._records);
+
+    load: function(options) {
+      options = options || {};
+      this.session = options.session || this.session;
+      this.id = options.id || this.id;
+
+      return this.session.getModel(this.id)
+        .then(function (resp) {
+          this._definition = resp.definition;
+          this._records = resp.records;
+          return this;
+        }.bind(this));
     },
-    delete: function() {
-      return this.session.deleteModel(this.modelname);
+
+    save: function(options) {
+      options = options || {};
+      this.session = options.session || this.session;
+      var modelId = options.id || this.id;
+      return this.session.addModel(modelId, this._definition, this._records)
+        .then(function(resp) {
+          this.id = resp.id;
+        }.bind(this));
+    },
+
+    delete: function(options) {
+      options = options || {};
+      this.session = options.session || this.session;
+      return session.deleteModel(this.id);
     }
   };
 

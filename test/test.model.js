@@ -18,7 +18,7 @@ describe('Daybed.Model', function() {
         server.respondWith("GET", "/model/test", '{ "records": [{"status": "done"}], "definition": {"fields": "fff"}}');
 
         Daybed.startSession('').then(function (session) {
-            var model = new Model(session);
+            var model = new Model({session: session});
             model.load()
               .then(function () {
                 assert.equal(model.records()[0].status, 'done');
