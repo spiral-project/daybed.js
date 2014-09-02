@@ -1,18 +1,26 @@
 {
   "name": "daybed.js",
   "description": "Daybed Javascript Developer Toolkit",
-  "version": "0.1.0-dev",
-  "author": "Mozilla (https://mozilla.org/)",
+  "version": "0.1.2-dev",
   "homepage": "https://github.com/spiral-project/daybed.js/",
+  "author": "Daybed devs <daybed.dev@librelist.com>",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git@github.com:spiral-project/daybed.js.git"
   },
   "scripts": {
-    "test": "make test"
+    "test": "make test",
+    "dist": "gulp dist"
   },
   "dependencies": {
-    "hawk": "2.2.*"
+    "hawk": "2.2.*",
+    "sjcl": "1.0.*",
+    "gulp": "^3.8.*",
+    "gulp-gh-pages": "^0.3.*",
+    "gulp-uglify": "^0.3.*",
+    "browserify": "^4.1.*",
+    "vinyl-source-stream": "^0.1.*"
   },
   "devDependencies": {
     "mocha": "1.21.*",
