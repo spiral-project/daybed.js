@@ -39,11 +39,11 @@ First, we start a new session on Daybed, and keep the token as if it was an *adm
 ```
 
 Then, you can keep using the same session object, or create a new one reusing
-the *admin* token :
+the *admin* token you obtained :
 
 ```javascript
 
-    var session = Daybed.startSession(server, { token: myToken });
+    var session = Daybed.startSession(server, { token: 'q89ryh..dcc' });
 
 ```
 
@@ -86,7 +86,7 @@ As the application author, you define a new model for your books list :
 ```
 
 As a model owner, you can adjust the permissions. For example, you can decide
-that everyone can cread, read, edit and delete their own records :
+that everyone can create, read, edit and delete their own records :
 
 ```javascript
 
@@ -126,8 +126,8 @@ Fetch the list of records :
 
 
     var books;
-
     var modelId = 'myapp:books';
+
     session.loadModel(modelId)
            .then(loaded);
 
@@ -184,9 +184,9 @@ You can also create new ones and assign them to specific permissions:
 ```javascript
 
     Daybed.getToken()
-          .then(assignPermissions);
+          .then(addDeletePermissions);
 
-    function assignPermissions(credentials) {
+    function addDeletePermissions(credentials) {
       var token = credentials.token;
       console.log(token + ' will be allowed to delete any record');
 

@@ -45,6 +45,7 @@
         // Error bad status
         if (!("" + req.status).match(/^2/)) {
           var error = new Error(response);
+          console.error(error);
           reject(error, req);
           return;
         }
@@ -55,7 +56,6 @@
 
       req.onerror = req.ontimeout = function(event) {
         var error = new Error(event.target.status);
-        console.log('onerror');
         console.error(error);
         reject(error, req);
       };
