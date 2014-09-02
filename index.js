@@ -37,21 +37,27 @@
             response = JSON.parse(req.responseText);
           }
           catch (e) {
+            console.warn("Could not parse response as JSON");
             response = req.responseText;
           }
         }
 
         // Error bad status
         if (!("" + req.status).match(/^2/)) {
-          reject(new Error(response), req);
+          var error = new Error(response);
+          reject(error, req);
           return;
         }
+
         // Success
         resolve(response);
       };
 
       req.onerror = req.ontimeout = function(event) {
-        reject(new Error(event.target.status), req);
+        var error = new Error(event.target.status);
+        console.log('onerror');
+        console.error(error);
+        reject(error, req);
       };
 
       // Run request
