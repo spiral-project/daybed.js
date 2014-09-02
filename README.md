@@ -21,8 +21,8 @@ We use JavaScript Promises since most operations are run asynchronously.
 
 ### Setup
 
-As the main developper of your app, you will start by defining a *model* on
-the Daybed server.
+As the main developper of your app, it's common to start by defining a *model*
+on the Daybed server.
 
 Let's say you want to build an app to list the books you would like to read.
 
@@ -107,7 +107,7 @@ You can now implement your application, and let your users manage their records 
 
 ### In your application
 
-Let's say, we want each user to store his session token in the local storage.
+Let's say, we want each user to store her session token in the local storage.
 The first time, a new token will be created :
 
 ```javascript
@@ -174,8 +174,9 @@ URL location hash for example (instead of localStorage) :
 
 ```
 
-This way, each user can share his identity on several devices, and even share his
-own privileges and collaborate with the entire world !
+This way, each user can share her identity on several devices, and even share
+her 
+own privileges and collaborate with the entire world!
 
 
 You can also create new ones and assign them to specific permissions:
