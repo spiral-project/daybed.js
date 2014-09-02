@@ -11,6 +11,7 @@
   function request(options) {
     return new Promise(function(resolve, reject) {
       var req = new XMLHttpRequest();
+      options.url = options.host + '/v1' + options.url;
       req.open(options.method, options.url, true);
       req.setRequestHeader('Content-Type', 'application/json');
       req.setRequestHeader('Accept', 'application/json');
@@ -108,7 +109,8 @@
       // Check provided credentials
       return request({
         method: "GET",
-        url: host + "/token",
+        host: host,
+        url: "/token",
         credentials: credentials
       });
     }
@@ -116,7 +118,8 @@
       // Create new credentials
       return request({
         method: "POST",
-        url: host + "/tokens"
+        host: host,
+        url: "/tokens"
       });
     }
   }
@@ -124,21 +127,24 @@
   function hello(host) {
     return request({
       method: "GET",
-      url: host + "/"
+      host: host,
+      url: "/"
     });
   }
 
   function fields(host) {
     return request({
       method: "GET",
-      url: host + "/fields"
+      host: host,
+      url: "/fields"
     });
   }
 
   function spore(host) {
     return request({
       method: "GET",
-      url: host + "/spore"
+      host: host,
+      url: "/spore"
     });
   }
 
@@ -184,7 +190,8 @@
     getModels: function() {
       return request({
         method: "GET",
-        url: this.host + "/models",
+        host: this.host,
+        url: "/models",
         credentials: this.credentials
       })
       .then(function(doc) {
@@ -202,14 +209,15 @@
 
       if (modelId === undefined) {
         method = "POST";
-        url = this.host + "/models";
+        url = "/models";
       } else {
         method = "PUT";
-        url = this.host + "/models/" + modelId;
+        url = "/models/" + modelId;
       }
 
       return request({
         method: method,
+        host: this.host,
         url: url,
         body: {definition: definition, records: records},
         credentials: this.credentials
@@ -219,7 +227,8 @@
     getModel: function(modelId) {
       return request({
         method: "GET",
-        url: this.host + "/models/" + modelId,
+        host: this.host,
+        url: "/models/" + modelId,
         credentials: this.credentials
       });
     },
@@ -227,7 +236,8 @@
     deleteModel: function(modelId) {
       return request({
         method: "DELETE",
-        url: this.host + "/models/" + modelId,
+        host: this.host,
+        url: "/models/" + modelId,
         credentials: this.credentials
       });
     },
@@ -235,7 +245,8 @@
     getDefinition: function(modelId) {
       return request({
         method: "GET",
-        url: this.host + "/models/" + modelId + "/definition",
+        host: this.host,
+        url: "/models/" + modelId + "/definition",
         credentials: this.credentials
       });
     },
@@ -243,7 +254,8 @@
     getPermissions: function(modelId) {
       return request({
         method: "GET",
-        url: this.host + "/models/" + modelId + "/permissions",
+        host: this.host,
+        url: "/models/" + modelId + "/permissions",
         credentials: this.credentials
       });
     },
@@ -251,7 +263,8 @@
     putPermissions: function(modelId, permissions) {
       return request({
         method: "PUT",
-        url: this.host + "/models/" + modelId + "/permissions",
+        host: this.host,
+        url: "/models/" + modelId + "/permissions",
         body: permissions,
         credentials: this.credentials
       });
@@ -260,7 +273,8 @@
     patchPermissions: function(modelId, rules) {
       return request({
         method: "PATCH",
-        url: this.host + "/models/" + modelId + "/permissions",
+        host: this.host,
+        url: "/models/" + modelId + "/permissions",
         body: rules,
         credentials: this.credentials
       });
@@ -269,7 +283,8 @@
     getRecords: function(modelId) {
       return request({
         method: "GET",
-        url: this.host + "/models/" + modelId + "/records",
+        host: this.host,
+        url: "/models/" + modelId + "/records",
         credentials: this.credentials
       });
     },
@@ -277,7 +292,8 @@
     deleteRecords: function(modelId) {
       return request({
         method: "DELETE",
-        url: this.host + "/models/" + modelId + "/records",
+        host: this.host,
+        url: "/models/" + modelId + "/records",
         credentials: this.credentials
       });
     },
@@ -285,7 +301,8 @@
     getRecord: function(modelId, recordId) {
       return request({
         method: "GET",
-        url: this.host + "/models/" + modelId + "/records/" + recordId,
+        host: this.host,
+        url: "/models/" + modelId + "/records/" + recordId,
         credentials: this.credentials
       });
     },
@@ -295,14 +312,15 @@
 
       if (!record.hasOwnProperty("id") || !record.id) {
         method = "POST";
-        url = this.host + "/models/" + modelId + "/records";
+        url = "/models/" + modelId + "/records";
       } else {
         method = "PUT";
-        url = this.host + "/models/" + modelId + "/records/" + record.id;
+        url = "/models/" + modelId + "/records/" + record.id;
       }
 
       return request({
         method: method,
+        host: this.host,
         url: url,
         body: record,
         credentials: this.credentials
@@ -314,14 +332,15 @@
 
       if (!record.hasOwnProperty("id")) {
         method = "POST";
-        url = this.host + "/models/" + modelId + "/records";
+        url = "/models/" + modelId + "/records";
       } else {
         method = "PUT";
-        url = this.host + "/models/" + modelId + "/records/" + record.id;
+        url = "/models/" + modelId + "/records/" + record.id;
       }
 
       return request({
         method: method,
+        host: this.host,
         url: url,
         body: record,
         validateOnly: true,
@@ -332,7 +351,8 @@
     patchRecord: function(modelId, recordId, patch) {
       return request({
         method: "PATCH",
-        url: this.host + "/models/" + modelId + "/records/" + recordId,
+        host: this.host,
+        url: "/models/" + modelId + "/records/" + recordId,
         body: patch,
         credentials: this.credentials
       });
@@ -341,7 +361,8 @@
     deleteRecord: function(modelId, recordId) {
       return request({
         method: "DELETE",
-        url: this.host + "/models/" + modelId + "/records/" + recordId,
+        host: this.host,
+        url: "/models/" + modelId + "/records/" + recordId,
         credentials: this.credentials
       });
     }
