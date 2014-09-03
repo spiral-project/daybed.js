@@ -1,4 +1,4 @@
-# Daybed.js
+# daybed.js
 
 A library to use [Daybed](http://daybed.readthedocs.org) in your Javascript
 applications.
@@ -8,13 +8,20 @@ applications.
 
 ## Rationale
 
-**Daybed** is a REST backend, and does not require any particular library
+Note that **Daybed** is a REST backend, and does not require any particular library
 to be used in your applications.
 
-However, since (*however optional*) authentication relies on Hawk, we built some
-helpers to ease the manipulation of session tokens.
+**daybed.js** brings some helpers to ease the manipulation of sessions and asynchronous
+operations.
 
-We use JavaScript Promises since most operations are run asynchronously.
+    Check out [backbone-daybed](https://github.com/spiral-project/backbone-daybed),
+    which brings Backbone.js helpers with *jQuery* instead of *daybed.js*.
+
+We take advantage of [Promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise), which may require [a polyfill](https://www.npmjs.org/package/promise-polyfill) on some browsers.
+
+Optional authentication relies on [Hawk](https://github.com/hueniverse/hawk).
+Tokens are manipulated with [SJCL](http://bitwiseshiftleft.github.io/sjcl/).
+
 
 ## Example
 
@@ -175,7 +182,7 @@ URL location hash for example (instead of localStorage) :
 ```
 
 This way, each user can share her identity on several devices, and even share
-her 
+her
 own privileges and collaborate with the entire world!
 
 
