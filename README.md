@@ -30,7 +30,7 @@ First, we start a new session on Daybed, and keep the token as if it was an *adm
 
 ```javascript
 
-    var server = 'http://daybed.spiral-project.org/v1/';
+    var server = 'https://daybed.lolnet.org/v1/';
     var session = Daybed.startSession(server)
                         .then(function (session) {
                           console.log("Keep this somewhere safe " + session.token);
@@ -43,7 +43,7 @@ the *admin* token you obtained :
 
 ```javascript
 
-    var session = Daybed.startSession(server, { token: 'q89ryh..dcc' });
+    var session = new Daybed.Session(server, { token: 'q89ryh..dcc' });
 
 ```
 

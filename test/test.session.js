@@ -14,7 +14,7 @@ describe('Daybed.startSession', function() {
     });
 
     it("should create a new token if no credentials", function (done) {
-        server.respondWith("POST", "/tokens", '{ "credentials": { "id": 3.14, "key": "abc" } }');
+        server.respondWith("POST", "/v1/tokens", '{ "credentials": { "id": 3.14, "key": "abc" } }');
 
         Daybed.startSession('').then(function (session) {
             assert.equal(session.credentials.id, 3.14);
@@ -25,7 +25,7 @@ describe('Daybed.startSession', function() {
     });
 
     it("should validate credentials if specified", function (done) {
-        server.respondWith("GET", "/token", '{ "credentials": { "id": 3.14, "key": "abc" } }');
+        server.respondWith("GET", "/v1/token", '{ "credentials": { "id": 3.14, "key": "abc" } }');
 
         Daybed.startSession('', {
             credentials: {id: 'a', key: 'xyz'},
@@ -38,7 +38,7 @@ describe('Daybed.startSession', function() {
     });
 
     it("should derive the token if specified", function (done) {
-        server.respondWith("GET", "/token", '{ "credentials": { "id": 3.14, "key": "abc" } }');
+        server.respondWith("GET", "/v1/token", '{ "credentials": { "id": 3.14, "key": "abc" } }');
 
         Daybed.startSession('', {
             token: 'xyz'
@@ -51,7 +51,7 @@ describe('Daybed.startSession', function() {
     });
 
     it("should derive the token if specified as function", function (done) {
-        server.respondWith("GET", "/token", '{ "credentials": { "id": 3.14, "key": "abc" } }');
+        server.respondWith("GET", "/v1/token", '{ "credentials": { "id": 3.14, "key": "abc" } }');
 
         Daybed.startSession('', {
             token: function () { return 'xyz'; },
@@ -105,7 +105,7 @@ describe('Daybed.Session', function() {
     describe('Get models', function() {
 
         it("should fetch models from server", function (done) {
-            server.respondWith("GET", "/models", '{ "models": [{ "title": "a" }] }');
+            server.respondWith("GET", "/v1/models", '{ "models": [{ "title": "a" }] }');
 
             session.getModels().then(function (data) {
                 assert.equal(data[0].title, 'a');
@@ -119,7 +119,7 @@ describe('Daybed.Session', function() {
     describe('Load models', function() {
 
         it("should fetch single model from server", function (done) {
-            server.respondWith("GET", "/models/test", '{ "definition": { "title": "Test" } }');
+            server.respondWith("GET", "/v1/models/test", '{ "definition": { "title": "Test" } }');
 
             session.loadModel('test').then(function (model) {
                 assert.equal(model.definition().title, 'Test');
