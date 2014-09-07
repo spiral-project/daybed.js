@@ -230,6 +230,29 @@ Session.prototype = {
     });
   },
 
+  saveModels: function(definitions) {
+    var self = this;
+    return this.getModels()
+    .then(function(models) {
+      var existingIds = models.map(function(doc) {
+        return doc.id;
+      });
+      return existingIds;
+    })
+    .then(function (existingIds) {
+      var addMissingModels = definitions.map(function (modelId) {
+        modelId = self.prefixed(modelId);
+        if (existingIds.indexOf(modelId) === -1) {
+          return self.saveModel(modelId, definitions[modelId]);
+        }
+        else {
+          console.debug("Model", modelId, "already exists.");
+        }
+      });
+      return Promise.all(addMissingModels);
+    });
+  },
+
   deleteModel: function(modelId) {
     return request({
       method: "DELETE",
@@ -270,6 +293,10 @@ Session.prototype = {
   },
 
   getRecords: function(modelId) {
+    if (modelId.constructor == Array) {
+      return this._getMultiRecords(modelId);
+    }
+
     return request({
       method: "GET",
       host: this.host,
@@ -278,7 +305,22 @@ Session.prototype = {
     });
   },
 
-  deleteRecords: function(modelId) {
+  _getMultiRecords: function(modelsIds) {
+    var data = {};
+    var getRecords = modelsIds.map(function(modelId) {
+      return this.getRecords(modelId)
+        .then(function(records) {
+          data[modelId] = records;
+        });
+    }.bind(this));
+
+    return Promise.all(getRecords)
+      .then(function() {
+        return data;
+      });
+  },
+
+  deleteAllRecords: function(modelId) {
     return request({
       method: "DELETE",
       host: this.host,
@@ -318,6 +360,14 @@ Session.prototype = {
     });
   },
 
+  saveRecords: function(modelId, records) {
+    // Save all
+    var addUpdateRecords = records.map(function(record) {
+      return this.saveRecord(modelId, record);
+    });
+    return Promise.all(addUpdateRecords);
+  },
+
   validateRecord: function(modelId, record) {
     return this.saveRecord(modelId, record, {validateOnly: true});
   },
@@ -329,6 +379,53 @@ Session.prototype = {
       url: "/models/" + modelId + "/records/" + recordId,
       credentials: this.credentials
     });
+  },
+
+  deleteRecords: function(modelId, records) {
+    var deleteAll = records.map(function(record) {
+      return this.deleteRecord(modelId, record);
+    }.bind(this));
+
+    return Promise.all(deleteAll);
+  },
+
+  synchronizeRecords: function (modelId, records) {
+    var recordsById = {},
+        remotesById = {};
+
+    var recordsIds, remotesIds;
+
+    records.forEach(function (record) {
+      recordsById[record.id] = record;
+    });
+    recordsIds = recordsById.keys();
+
+    return this.getRecords(modelId)
+      .then(function(remotes) {
+        // Get remote records
+        remotes.forEach(function (remote) {
+          remotesById[remote.id] = remote;
+        });
+        remotesIds = remotesById.keys();
+      })
+      .then(function () {
+        // Get created/updated records
+        var changedRecords = recordsIds.map(function(recordId) {
+          var record = recordsById[recordId],
+              remote = remotesById[recordId];
+          if (!objectEquals(record, remote)) {
+            return record;
+          }
+        });
+        return this.addRecords(modelId, changedRecords);
+      })
+      .then(function() {
+        // Get deleted records
+        var deletedIds = remotesIds.filter(function(recordId) {
+          return recordsIds.indexOf(recordId) === -1;
+        });
+        return this.deleteRecords(modelId, deletedIds);
+      });
   }
 };
 
