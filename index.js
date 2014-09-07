@@ -167,6 +167,7 @@ function Session(host, options) {
   this.host = host;
   this.options = options;
   this.token = options.token;
+  this.prefix = options.prefix || '';
   this.credentials = _credentials(options);
 }
 
@@ -196,7 +197,13 @@ Session.prototype = {
     });
   },
 
+  _prefixed: function (modelId) {
+    return (new RegExp('^' + this.prefix)).test(modelId) ?
+      modelId : this.prefix + modelId;
+  },
+
   loadModel: function(modelId) {
+    modelId = this._prefixed(modelId);
     var model = new Model({id: modelId, session: this});
     return model.load();
   },
@@ -209,7 +216,7 @@ Session.prototype = {
       url = "/models";
     } else {
       method = "PUT";
-      url = "/models/" + modelId;
+      url = "/models/" + this._prefixed(modelId);
     }
 
     return request({
@@ -225,7 +232,7 @@ Session.prototype = {
     return request({
       method: "GET",
       host: this.host,
-      url: "/models/" + modelId,
+      url: "/models/" + this._prefixed(modelId),
       credentials: this.credentials
     });
   },
@@ -234,7 +241,7 @@ Session.prototype = {
     return request({
       method: "DELETE",
       host: this.host,
-      url: "/models/" + modelId,
+      url: "/models/" + this._prefixed(modelId),
       credentials: this.credentials
     });
   },
@@ -243,7 +250,7 @@ Session.prototype = {
     return request({
       method: "GET",
       host: this.host,
-      url: "/models/" + modelId + "/definition",
+      url: "/models/" + this._prefixed(modelId) + "/definition",
       credentials: this.credentials
     });
   },
@@ -252,7 +259,7 @@ Session.prototype = {
     return request({
       method: "GET",
       host: this.host,
-      url: "/models/" + modelId + "/permissions",
+      url: "/models/" + this._prefixed(modelId) + "/permissions",
       credentials: this.credentials
     });
   },
@@ -261,7 +268,7 @@ Session.prototype = {
     return request({
       method: "PUT",
       host: this.host,
-      url: "/models/" + modelId + "/permissions",
+      url: "/models/" + this._prefixed(modelId) + "/permissions",
       body: permissions,
       credentials: this.credentials
     });
@@ -271,7 +278,7 @@ Session.prototype = {
     return request({
       method: "PATCH",
       host: this.host,
-      url: "/models/" + modelId + "/permissions",
+      url: "/models/" + this._prefixed(modelId) + "/permissions",
       body: rules,
       credentials: this.credentials
     });
@@ -281,7 +288,7 @@ Session.prototype = {
     return request({
       method: "GET",
       host: this.host,
-      url: "/models/" + modelId + "/records",
+      url: "/models/" + this._prefixed(modelId) + "/records",
       credentials: this.credentials
     });
   },
@@ -290,7 +297,7 @@ Session.prototype = {
     return request({
       method: "DELETE",
       host: this.host,
-      url: "/models/" + modelId + "/records",
+      url: "/models/" + this._prefixed(modelId) + "/records",
       credentials: this.credentials
     });
   },
@@ -299,7 +306,7 @@ Session.prototype = {
     return request({
       method: "GET",
       host: this.host,
-      url: "/models/" + modelId + "/records/" + recordId,
+      url: "/models/" + this._prefixed(modelId) + "/records/" + recordId,
       credentials: this.credentials
     });
   },
@@ -309,10 +316,10 @@ Session.prototype = {
 
     if (!record.hasOwnProperty("id") || !record.id) {
       method = "POST";
-      url = "/models/" + modelId + "/records";
+      url = "/models/" + this._prefixed(modelId) + "/records";
     } else {
       method = "PUT";
-      url = "/models/" + modelId + "/records/" + record.id;
+      url = "/models/" + this._prefixed(modelId) + "/records/" + record.id;
     }
 
     return request({
@@ -329,10 +336,10 @@ Session.prototype = {
 
     if (!record.hasOwnProperty("id")) {
       method = "POST";
-      url = "/models/" + modelId + "/records";
+      url = "/models/" + this._prefixed(modelId) + "/records";
     } else {
       method = "PUT";
-      url = "/models/" + modelId + "/records/" + record.id;
+      url = "/models/" + this._prefixed(modelId) + "/records/" + record.id;
     }
 
     return request({
@@ -349,7 +356,7 @@ Session.prototype = {
     return request({
       method: "PATCH",
       host: this.host,
-      url: "/models/" + modelId + "/records/" + recordId,
+      url: "/models/" + this._prefixed(modelId) + "/records/" + recordId,
       body: patch,
       credentials: this.credentials
     });
@@ -359,7 +366,7 @@ Session.prototype = {
     return request({
       method: "DELETE",
       host: this.host,
-      url: "/models/" + modelId + "/records/" + recordId,
+      url: "/models/" + this._prefixed(modelId) + "/records/" + recordId,
       credentials: this.credentials
     });
   }

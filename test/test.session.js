@@ -128,4 +128,37 @@ describe('Daybed.Session', function() {
             server.respond();
         });
     });
+
+
+    describe('Prefixed models', function() {
+
+        before(function () {
+            session.prefix = 'app:';
+        });
+
+        after(function () {
+            session.prefix = '';
+        });
+
+        it("should prefix automatically model ids", function (done) {
+            server.respondWith("GET", "/v1/models/app:test", '{ "definition": { "title": "Test" } }');
+
+            session.loadModel('test').then(function (model) {
+                assert.equal(model.definition().title, 'Test');
+                done();
+            });
+            server.respond();
+        });
+
+        it("should not add prefix if model id is already prefixed", function (done) {
+            server.respondWith("GET", "/v1/models/app:test", '{ "definition": { "title": "Test" } }');
+
+            session.loadModel('app:test').then(function (model) {
+                assert.equal(model.definition().title, 'Test');
+                done();
+            });
+            server.respond();
+        });
+
+    });
 });
