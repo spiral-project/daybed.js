@@ -196,12 +196,21 @@ Session.prototype = {
     });
   },
 
+  getModel: function(modelId) {
+    return request({
+      method: "GET",
+      host: this.host,
+      url: "/models/" + modelId,
+      credentials: this.credentials
+    });
+  },
+
   loadModel: function(modelId) {
     var model = new Model({id: modelId, session: this});
     return model.load();
   },
 
-  addModel: function(modelId, definition, records) {
+  saveModel: function(modelId, definition, records) {
     var url, method;
 
     if (modelId === undefined) {
@@ -217,15 +226,6 @@ Session.prototype = {
       host: this.host,
       url: url,
       body: {definition: definition, records: records},
-      credentials: this.credentials
-    });
-  },
-
-  getModel: function(modelId) {
-    return request({
-      method: "GET",
-      host: this.host,
-      url: "/models/" + modelId,
       credentials: this.credentials
     });
   },
@@ -257,22 +257,14 @@ Session.prototype = {
     });
   },
 
-  putPermissions: function(modelId, permissions) {
+  savePermissions: function(modelId, permissions, options) {
+    options = options || {};
+    var method = !!options.replace ? 'PUT' : 'PATCH';
     return request({
-      method: "PUT",
+      method: method,
       host: this.host,
       url: "/models/" + modelId + "/permissions",
       body: permissions,
-      credentials: this.credentials
-    });
-  },
-
-  patchPermissions: function(modelId, rules) {
-    return request({
-      method: "PATCH",
-      host: this.host,
-      url: "/models/" + modelId + "/permissions",
-      body: rules,
       credentials: this.credentials
     });
   },
@@ -304,14 +296,15 @@ Session.prototype = {
     });
   },
 
-  addRecord: function(modelId, record) {
+  saveRecord: function(modelId, record, options) {
+    options = options || {};
     var url, method;
 
     if (!record.hasOwnProperty("id") || !record.id) {
       method = "POST";
       url = "/models/" + modelId + "/records";
     } else {
-      method = "PUT";
+      method = options.replace ? "PUT" : "PATCH";
       url = "/models/" + modelId + "/records/" + record.id;
     }
 
@@ -320,39 +313,13 @@ Session.prototype = {
       host: this.host,
       url: url,
       body: record,
+      validateOnly: !!options.validateOnly,
       credentials: this.credentials
     });
   },
 
   validateRecord: function(modelId, record) {
-    var url, method;
-
-    if (!record.hasOwnProperty("id")) {
-      method = "POST";
-      url = "/models/" + modelId + "/records";
-    } else {
-      method = "PUT";
-      url = "/models/" + modelId + "/records/" + record.id;
-    }
-
-    return request({
-      method: method,
-      host: this.host,
-      url: url,
-      body: record,
-      validateOnly: true,
-      credentials: this.credentials
-    });
-  },
-
-  patchRecord: function(modelId, recordId, patch) {
-    return request({
-      method: "PATCH",
-      host: this.host,
-      url: "/models/" + modelId + "/records/" + recordId,
-      body: patch,
-      credentials: this.credentials
-    });
+    return this.saveRecord(modelId, record, {validateOnly: true});
   },
 
   deleteRecord: function(modelId, recordId) {
@@ -409,7 +376,7 @@ Model.prototype = {
     var modelId = options.id || this.id;
 
     var self = this;
-    return this.session.addModel(modelId, this._definition, this._records)
+    return this.session.saveModel(modelId, this._definition, this._records)
       .then(function(resp) {
         self.id = resp.id;
         return self;
@@ -419,7 +386,7 @@ Model.prototype = {
   delete: function(options) {
     options = options || {};
     this.session = options.session || this.session;
-    return session.deleteModel(this.id);
+    return this.session.deleteModel(this.id);
   }
 };
 

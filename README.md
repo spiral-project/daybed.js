@@ -97,7 +97,7 @@ that everyone can create, read, edit and delete their own records :
 
 ```javascript
 
-    session.patchPermissions(modelId, {
+    session.savePermissions(modelId, {
       'Everyone': ['create_record', 'read_own_records', 'delete_own_records',
                    'read_definition']
     })
@@ -198,7 +198,7 @@ You can also create new ones and assign them to specific permissions:
 
       var permissions = {};
       permissions[token] = ['delete_all_records'];
-      session.patchPermissions(modelId, permissions);
+      session.savePermissions(modelId, permissions);
     });
 
 ```
