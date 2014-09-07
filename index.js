@@ -240,7 +240,7 @@ Session.prototype = {
       return existingIds;
     })
     .then(function (existingIds) {
-      var addMissingModels = definitions.map(function (modelId) {
+      var addMissingModels = Object.keys(models).map(function (modelId) {
         modelId = self.prefixed(modelId);
         if (existingIds.indexOf(modelId) === -1) {
           return self.saveModel(modelId, definitions[modelId]);
@@ -402,7 +402,7 @@ Session.prototype = {
     records.forEach(function (record) {
       recordsById[record.id] = record;
     });
-    recordsIds = recordsById.keys();
+    recordsIds = Object.keys(recordsById);
 
     return this.getRecords(modelId)
       .then(function(remotes) {
@@ -410,7 +410,7 @@ Session.prototype = {
         remotes.forEach(function (remote) {
           remotesById[remote.id] = remote;
         });
-        remotesIds = remotesById.keys();
+        remotesIds = Object.keys(remotesById);
       })
       .then(function () {
         // Get created/updated records
@@ -433,7 +433,7 @@ Session.prototype = {
   },
 
   _synchronizeMultiRecords: function(recordsByModelId) {
-    var synchronizeAll = recordsByModelId.map(function (modelId) {
+    var synchronizeAll = Object.keys(recordsByModelId).map(function (modelId) {
       var records = recordsByModelId[modelId];
       return this.synchronizeRecords(modelId, records);
     }.bind(this));
