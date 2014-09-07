@@ -390,6 +390,10 @@ Session.prototype = {
   },
 
   synchronizeRecords: function (modelId, records) {
+    if (typeof modelId == 'object') {
+      return this._synchronizeMultiRecords(modelId);
+    }
+
     var recordsById = {},
         remotesById = {};
 
@@ -426,6 +430,14 @@ Session.prototype = {
         });
         return this.deleteRecords(modelId, deletedIds);
       });
+  },
+
+  _synchronizeMultiRecords: function(recordsByModelId) {
+    var synchronizeAll = recordsByModelId.map(function (modelId) {
+      var records = recordsByModelId[modelId];
+      return this.synchronizeRecords(modelId, records);
+    }.bind(this));
+    return Promise.all(synchronizeAll);
   }
 };
 
