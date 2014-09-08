@@ -210,7 +210,7 @@ Session.prototype = {
     return model.load();
   },
 
-  saveModel: function(modelId, definition, records) {
+  saveModel: function(modelId, model) {
     var url, method;
 
     if (modelId === undefined) {
@@ -225,16 +225,16 @@ Session.prototype = {
       method: method,
       host: this.host,
       url: url,
-      body: {definition: definition, records: records},
+      body: model,
       credentials: this.credentials
     });
   },
 
-  saveModels: function(definitions) {
+  saveModels: function(models) {
     var self = this;
     return this.getModels()
-    .then(function(models) {
-      var existingIds = models.map(function(doc) {
+    .then(function(existing) {
+      var existingIds = existing.map(function(doc) {
         return doc.id;
       });
       return existingIds;
@@ -243,7 +243,7 @@ Session.prototype = {
       var addMissingModels = Object.keys(models).map(function (modelId) {
         modelId = self.prefixed(modelId);
         if (existingIds.indexOf(modelId) === -1) {
-          return self.saveModel(modelId, definitions[modelId]);
+          return self.saveModel(modelId, models[modelId]);
         }
         else {
           console.debug("Model", modelId, "already exists.");
@@ -484,8 +484,10 @@ Model.prototype = {
     this.session = options.session || this.session;
     var modelId = options.id || this.id;
 
+    var model = {definition: this._definition, records: this._records};
+
     var self = this;
-    return this.session.saveModel(modelId, this._definition, this._records)
+    return this.session.saveModel(modelId, model)
       .then(function(resp) {
         self.id = resp.id;
         return self;
