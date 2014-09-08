@@ -120,7 +120,7 @@ The first time, a new token will be created :
 ```javascript
 
     var token = localStorage.getItem('myapp:books:token');
-    var session = Daybed.startSession({ token: token })
+    var session = Daybed.startSession(server, { token: token })
                         .then(function (session) {
                           localStorage.setItem('myapp:books:token', session.token);
                         });
