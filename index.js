@@ -221,13 +221,23 @@ Session.prototype = {
       url = "/models/" + modelId;
     }
 
-    return request({
+    var create = request({
       method: method,
       host: this.host,
       url: url,
       body: model,
       credentials: this.credentials
     });
+
+    if (model.permissions) {
+      // So far, Daybed does not handle permissions during model creation
+      // see https://github.com/spiral-project/daybed/pull/230
+      create = create.then(function () {
+        this.savePermissions(modelId, model.permissions);
+      }.bind(this));
+    }
+
+    return create;
   },
 
   saveModels: function(models) {
