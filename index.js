@@ -1,5 +1,6 @@
 "use strict";
 
+var utils = require('./ext/utils.js');
 var hawk = require('hawk');
 var deriveHawkCredentials = require('./ext/hkdf.js').deriveHawkCredentials;
 
@@ -434,7 +435,7 @@ Session.prototype = {
         var changedRecords = recordsIds.map(function(recordId) {
           var record = recordsById[recordId],
               remote = remotesById[recordId];
-          if (!objectEquals(record, remote)) {
+          if (!utils.objectEquals(record, remote)) {
             return record;
           }
         });
