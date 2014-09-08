@@ -241,7 +241,7 @@ Session.prototype = {
     })
     .then(function (existingIds) {
       var addMissingModels = Object.keys(models).map(function (modelId) {
-        modelId = self.prefixed(modelId);
+        modelId = self._prefixed(modelId);
         if (existingIds.indexOf(modelId) === -1) {
           return self.saveModel(modelId, models[modelId]);
         }
