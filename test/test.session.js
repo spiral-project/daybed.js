@@ -96,6 +96,7 @@ describe('Daybed.Session', function() {
         });
     });
 
+
     describe('Get models', function() {
 
         it("should fetch models from server", function (done) {
@@ -103,6 +104,49 @@ describe('Daybed.Session', function() {
 
             session.getModels().then(function (data) {
                 assert.equal(data[0].title, 'a');
+                done();
+            });
+        });
+    });
+
+
+    describe('Save models', function() {
+
+        it("should save permissions if specified", function (done) {
+            server.respondWith("PUT", "/v1/models/app:test", '{ "definition": {} }');
+            server.respondWith("PATCH", "/v1/models/app:test/permissions", '{ "userid": ["read_all_records"] }');
+
+            var example = {definition: {}, permissions: {"Everyone": ["+ALL"]}};
+
+            session.saveModel('app:test', example)
+            .then(function (permissions) {
+                assert.deepEqual(permissions['userid'], ['read_all_records']);
+                done();
+            });
+        });
+
+        it("should save all specified models", function (done) {
+            server.respondWith("GET", "/v1/models", '{ "models": [] }');
+            server.respondWith("PUT", "/v1/models/app:mod1", '{ "title": "a", "definition": {} }');
+            server.respondWith("PUT", "/v1/models/app:mod2", '{ "title": "b", "definition": {} }');
+
+            session.saveModels({'app:mod1': {}, 'app:mod2': {}})
+            .then(function (responses) {
+                assert.deepEqual(responses[0], { "title": "a", "definition": {} });
+                assert.deepEqual(responses[1], { "title": "b", "definition": {} });
+                done();
+            });
+        });
+
+        it("should save only those missing", function (done) {
+            server.respondWith("GET", "/v1/models", '{ "models": [ {"id": "app:mod1"} ] }');
+            server.respondWith("GET", "/v1/models/app:mod1", '{ "title": "a", "definition": {} }');
+            server.respondWith("PUT", "/v1/models/app:mod2", '{ "title": "b", "definition": {} }');
+
+            session.saveModels({'app:mod1': {}, 'app:mod2': {}})
+            .then(function (responses) {
+                assert.deepEqual(responses[0], { "title": "a", "definition": {} });
+                assert.deepEqual(responses[1], { "title": "b", "definition": {} });
                 done();
             });
         });
@@ -155,6 +199,48 @@ describe('Daybed.Session', function() {
 
     describe('Save Permissions', function() {
 
+        var example = {"Everyone": ["-ALL"]};
+
+        it("should patch existing permissions by default", function (done) {
+            server.respondWith("PATCH", "/v1/models/app:test/permissions", '{ "userid": ["read_all_records"] }');
+
+            session.savePermissions('app:test', example)
+            .then(function (permissions) {
+                assert.deepEqual(permissions['userid'], ['read_all_records']);
+                done();
+            });
+        });
+
+        it("should replace permissions if option is specified", function (done) {
+            server.respondWith("PUT", "/v1/models/app:test/permissions", '{ "userid": ["read_all_records"] }');
+
+            session.savePermissions('app:test', example, {replace: true})
+            .then(function (permissions) {
+                assert.deepEqual(permissions['userid'], ['read_all_records']);
+                done();
+            });
+        });
+    });
+
+
+    describe('Get records', function() {
+        it("should return an object with records attribute");
+        it("should accept a list of models");
+    });
+
+
+    describe('Save records', function() {
+        it("single patch default");
+        it("replace");
+        it("many");
+        it("should validate only");
+    });
+
+
+    describe('Delete records', function() {
+        it("delete single");
+        it("delete many");
+        it("delete all");
     });
 
 });

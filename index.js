@@ -241,7 +241,7 @@ Session.prototype = {
       // So far, Daybed does not handle permissions during model creation
       // see https://github.com/spiral-project/daybed/pull/230
       create = create.then(function () {
-        this.savePermissions(modelId, model.permissions);
+        return this.savePermissions(modelId, model.permissions);
       }.bind(this));
     }
 
@@ -265,6 +265,7 @@ Session.prototype = {
         }
         else {
           console.debug("Model", modelId, "already exists.");
+          return self.getModel(modelId);
         }
       });
       return Promise.all(addMissingModels);
