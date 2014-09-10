@@ -7,6 +7,7 @@ describe('Daybed.startSession', function() {
 
     beforeEach(function () {
         server = sinon.fakeServer.create();
+        server.autoRespond = true;
     });
 
     afterEach(function () {
@@ -20,8 +21,6 @@ describe('Daybed.startSession', function() {
             assert.equal(session.credentials.id, 3.14);
             done();
         });
-
-        server.respond();
     });
 
     it("should validate credentials if specified", function (done) {
@@ -33,8 +32,6 @@ describe('Daybed.startSession', function() {
             assert.equal(session.credentials.id, '3.14');
             done();
         });
-
-        server.respond();
     });
 
     it("should derive the token if specified", function (done) {
@@ -46,8 +43,6 @@ describe('Daybed.startSession', function() {
             assert.equal(session.credentials.algorithm, 'sha256');
             done();
         });
-
-        server.respond();
     });
 
     it("should derive the token if specified as function", function (done) {
@@ -59,8 +54,6 @@ describe('Daybed.startSession', function() {
             assert.equal(session.credentials.algorithm, 'sha256');
             done();
         });
-
-        server.respond();
     });
 });
 
@@ -72,6 +65,7 @@ describe('Daybed.Session', function() {
 
     beforeEach(function () {
         server = sinon.fakeServer.create();
+        server.autoRespond = true;
     });
 
     afterEach(function () {
@@ -111,7 +105,6 @@ describe('Daybed.Session', function() {
                 assert.equal(data[0].title, 'a');
                 done();
             });
-            server.respond();
         });
     });
 
@@ -125,7 +118,6 @@ describe('Daybed.Session', function() {
                 assert.equal(model.definition().title, 'Test');
                 done();
             });
-            server.respond();
         });
     });
 
@@ -147,7 +139,6 @@ describe('Daybed.Session', function() {
                 assert.equal(model.definition().title, 'Test');
                 done();
             });
-            server.respond();
         });
 
         it("should not add prefix if model id is already prefixed", function (done) {
@@ -157,8 +148,13 @@ describe('Daybed.Session', function() {
                 assert.equal(model.definition().title, 'Test');
                 done();
             });
-            server.respond();
         });
 
     });
+
+
+    describe('Save Permissions', function() {
+
+    });
+
 });

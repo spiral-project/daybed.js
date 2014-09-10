@@ -6,6 +6,7 @@ describe('Hello page', function() {
 
     beforeEach(function () {
         server = sinon.fakeServer.create();
+        server.autoRespond = true;
         sandbox = sinon.sandbox.create();
     });
 
@@ -21,7 +22,6 @@ describe('Hello page', function() {
             assert.equal(data.version, 1.0);
             done();
         });
-        server.respond();
     });
 
     it("should survive server errors", function (done) {
@@ -33,6 +33,5 @@ describe('Hello page', function() {
             assert.equal(error.message, 'Server down');
             done();
         });
-        server.respond();
     });
 });
