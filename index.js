@@ -409,55 +409,82 @@ Session.prototype = {
     });
   },
 
-  synchronizeRecords: function (modelId, records) {
+  synchronizeRecords: function (modelId, records, options) {
     if (typeof modelId == 'object') {
       return this._synchronizeMultiRecords(modelId);
     }
 
-    var recordsById = {},
-        remotesById = {};
+    var syncResult = {
+      created: [],
+      deleted: [],
+      updated: [],
+    };
 
-    var recordsIds, remotesIds;
+    var remotesById = {};
+    var remotesIds;
 
-    records.forEach(function (record) {
-      recordsById[record.id] = record;
+    var recordsIds = records.map(function (record) {
+      return record.id;
     });
-    recordsIds = Object.keys(recordsById);
 
     return this.getRecords(modelId)
-      .then(function(remotes) {
-        // Get remote records
-        remotes.forEach(function (remote) {
+      .then(function(response) {
+        // Get remote records before saving the new ones
+        response.records.forEach(function (remote) {
           remotesById[remote.id] = remote;
         });
         remotesIds = Object.keys(remotesById);
-      })
-      .then(function () {
-        // Get created/updated records
-        var changedRecords = recordsIds.map(function(recordId) {
-          var record = recordsById[recordId],
-              remote = remotesById[recordId];
-          if (!utils.objectEquals(record, remote)) {
-            return record;
-          }
+
+        // Get created records
+        var createdRecords = records.filter(function (record) {
+          return record.id === undefined;
         });
-        return this.addRecords(modelId, changedRecords);
-      })
-      .then(function() {
+
+        return this.saveRecords(modelId, createdRecords);
+      }.bind(this))
+      .then(function (created) {
+        syncResult.created = created;
+
+        // Get updated records
+        var changedRecords = records.filter(function(record) {
+          if (record.id === undefined)
+            return false;
+          var remote = remotesById[record.id];
+          return !utils.objectEquals(record, remote);
+        });
+        return this.saveRecords(modelId, changedRecords);
+      }.bind(this))
+      .then(function(updated) {
+        syncResult.updated = updated;
+
         // Get deleted records
         var deletedIds = remotesIds.filter(function(recordId) {
           return recordsIds.indexOf(recordId) === -1;
         });
         return this.deleteRecords(modelId, deletedIds);
+      }.bind(this))
+      .then(function (deleted) {
+        syncResult.deleted = deleted;
+
+        return syncResult;
       });
   },
 
   _synchronizeMultiRecords: function(recordsByModelId) {
-    var synchronizeAll = Object.keys(recordsByModelId).map(function (modelId) {
+    var modelIds = Object.keys(recordsByModelId);
+    var synchronizeAll = modelIds.map(function (modelId) {
       var records = recordsByModelId[modelId];
       return this.synchronizeRecords(modelId, records);
     }.bind(this));
-    return Promise.all(synchronizeAll);
+
+    return Promise.all(synchronizeAll)
+    .then(function (responses) {
+      var results = {};
+      modelIds.forEach(function (modelId, i) {
+        results[modelId] = responses[i];
+      });
+      return results;
+    });
   }
 };
 
