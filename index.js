@@ -339,15 +339,6 @@ Session.prototype = {
       });
   },
 
-  deleteAllRecords: function(modelId) {
-    return request({
-      method: "DELETE",
-      host: this.host,
-      url: "/models/" + this._prefixed(modelId) + "/records",
-      credentials: this.credentials
-    });
-  },
-
   getRecord: function(modelId, recordId) {
     return request({
       method: "GET",
@@ -359,9 +350,11 @@ Session.prototype = {
 
   saveRecord: function(modelId, record, options) {
     options = options || {};
+    var validateOnly = !!options.validateOnly;
+
     var url, method;
 
-    if (!record.hasOwnProperty("id") || !record.id) {
+    if (validateOnly || !record.hasOwnProperty("id") || !record.id) {
       method = "POST";
       url = "/models/" + this._prefixed(modelId) + "/records";
     } else {
@@ -374,16 +367,16 @@ Session.prototype = {
       host: this.host,
       url: url,
       body: record,
-      validateOnly: !!options.validateOnly,
+      validateOnly: validateOnly,
       credentials: this.credentials
     });
   },
 
-  saveRecords: function(modelId, records) {
+  saveRecords: function(modelId, records, options) {
     // Save all
     var addUpdateRecords = records.map(function(record) {
-      return this.saveRecord(modelId, record);
-    });
+      return this.saveRecord(modelId, record, options);
+    }.bind(this));
     return Promise.all(addUpdateRecords);
   },
 
@@ -404,8 +397,16 @@ Session.prototype = {
     var deleteAll = records.map(function(record) {
       return this.deleteRecord(modelId, record);
     }.bind(this));
-
     return Promise.all(deleteAll);
+  },
+
+  deleteAllRecords: function(modelId) {
+    return request({
+      method: "DELETE",
+      host: this.host,
+      url: "/models/" + this._prefixed(modelId) + "/records",
+      credentials: this.credentials
+    });
   },
 
   synchronizeRecords: function (modelId, records) {

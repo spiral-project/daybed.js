@@ -224,23 +224,127 @@ describe('Daybed.Session', function() {
 
 
     describe('Get records', function() {
-        it("should return an object with records attribute");
-        it("should accept a list of models");
+        it("should return an object with records attribute", function (done) {
+            server.respondWith("GET", "/v1/models/app:test/records", '{ "records": [ {"id": 1} ] }');
+
+            session.getRecords('app:test')
+            .then(function (response) {
+                assert.deepEqual(response.records, [{id: 1}]);
+                done();
+            });
+        });
+
+        it("should accept a list of many models and return all results", function (done) {
+            server.respondWith("GET", "/v1/models/app:mod1/records", '{ "records": [ {"id": 3} ] }');
+            server.respondWith("GET", "/v1/models/app:mod2/records", '{ "records": [ {"id": 4} ] }');
+
+            session.getRecords(['app:mod1', 'app:mod2'])
+            .then(function (response) {
+                assert.deepEqual(response, {
+                    'app:mod1': { "records": [ {"id": 3} ] },
+                    'app:mod2': { "records": [ {"id": 4} ] },
+                });
+                done();
+            });
+        });
     });
 
 
     describe('Save records', function() {
-        it("single patch default");
-        it("replace");
-        it("many");
-        it("should validate only");
+        it("should post if record has no id", function (done) {
+            server.respondWith("POST", "/v1/models/app:test/records", '{ "id": "abc" }');
+
+            session.saveRecord('app:test', {age: 42})
+            .then(function (record) {
+                assert.equal(record.id, 'abc');
+                done();
+            });
+        });
+
+        it("should patch by default if id is specified", function (done) {
+            server.respondWith("PATCH", "/v1/models/app:test/records/abc", '{ "id": "abc" }');
+
+            session.saveRecord('app:test', {id: 'abc', age: 42})
+            .then(function (record) {
+                assert.equal(record.id, 'abc');
+                done();
+            });
+        });
+
+        it("should replace existing record if replace is specified", function (done) {
+            server.respondWith("PUT", "/v1/models/app:test/records/abc", '{ "id": "abc" }');
+
+            session.saveRecord('app:test', {id: 'abc', age: 42}, {replace: true})
+            .then(function (record) {
+                assert.equal(record.id, 'abc');
+                done();
+            });
+        });
+
+        it("should be able to validate only", function (done) {
+            server.respondWith("POST", "/v1/models/app:test/records", '{ "id": "abc" }');
+
+            session.validateRecord('app:test', {id: 'abc', age: 42})
+            .then(function (record) {
+                assert.equal(record.id, 'abc');
+                done();
+            });
+        });
+
+        it("should be able to save many records", function (done) {
+            server.respondWith("PATCH", "/v1/models/app:test/records/abc", '{ "id": "abc" }');
+            server.respondWith("PATCH", "/v1/models/app:test/records/xyz", '{ "id": "xyz" }');
+
+            var records = [{id: 'abc', age: 42}, {id: 'xyz', age: 38}];
+
+            session.saveRecords('app:test', records)
+            .then(function (response) {
+                assert.deepEqual(response, [
+                    { "id": "abc" },
+                    { "id": "xyz" }
+                ]);
+                done();
+            });
+        });
+
     });
 
 
     describe('Delete records', function() {
-        it("delete single");
-        it("delete many");
-        it("delete all");
+
+        it("should delete single record", function (done) {
+            server.respondWith("DELETE", "/v1/models/app:test/records/abc", '{ "id": "abc" }');
+
+            session.deleteRecord('app:test', 'abc')
+            .then(function (response) {
+                assert.deepEqual(response, { "id": "abc" });
+                done();
+            });
+        });
+
+        it("should delete many records", function (done) {
+            server.respondWith("DELETE", "/v1/models/app:test/records/abc", '{ "id": "abc" }');
+            server.respondWith("DELETE", "/v1/models/app:test/records/xyz", '{ "id": "xyz" }');
+
+            session.deleteRecords('app:test', ['abc', 'xyz'])
+            .then(function (response) {
+                assert.deepEqual(response, [
+                    { "id": "abc" },
+                    { "id": "xyz" }
+                ]);
+                done();
+            });
+        });
+
+        it("should delete all model records", function (done) {
+            server.respondWith("DELETE", "/v1/models/app:test/records", '{ "records": [] }');
+
+            session.deleteAllRecords('app:test')
+            .then(function (response) {
+                assert.deepEqual(response, { "records": [] });
+                done();
+            });
+        });
     });
 
 });
