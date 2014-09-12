@@ -25,12 +25,32 @@ describe('Hello page', function() {
     });
 
     it("should survive server errors", function (done) {
-        server.respondWith("GET", "/v1/", [500, '', 'Server down']);
+        server.respondWith("GET", "/v1/", [500, '', '{ "message": "Server down" }']);
 
         sandbox.stub(console, 'warn');
         sandbox.stub(console, 'error');
+
         Daybed.hello('').catch(function (error) {
-            assert.equal(error.message, 'Server down');
+            assert.equal(error.name, "DaybedError");
+            assert.equal(error.status, 500);
+            assert.equal(error.message, 'Internal Server Error');
+            assert.deepEqual(error.response, {message: 'Server down'});
+            done();
+        });
+        server.respond();
+    });
+
+    it("should survive client-side errors", function (done) {
+        server.respondWith("GET", "/v1/", '{ "hello": "Daybed" }');
+
+        var failing = sandbox.stub(XMLHttpRequest.prototype, 'setRequestHeader');
+        failing.throws();
+
+        Daybed.hello('').catch(function (error) {
+            assert.equal(error.name, 'Error');
+            assert.equal(error.message, 'Error');
+            assert.isUndefined(error.status, 500);
+            assert.isUndefined(error.response);
             done();
         });
     });

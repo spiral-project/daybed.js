@@ -1,10 +1,23 @@
 "use strict";
 
 var utils = require('./ext/utils.js');
+var console = require("console");
 var hawk = require('hawk');
 var deriveHawkCredentials = require('./ext/hkdf.js').deriveHawkCredentials;
 
 var TIMEOUT = 15000;
+
+
+function DaybedError(options) {
+  options = options || {};
+  this.name = "DaybedError";
+  this.message = options.message || "";
+  this.status = options.status;
+  this.response = options.response;
+}
+DaybedError.prototype = new Error();
+DaybedError.prototype.constructor = DaybedError;
+
 
 function request(options) {
   return new Promise(function(resolve, reject) {
@@ -42,9 +55,13 @@ function request(options) {
       }
       // Error bad status
       if (!("" + req.status).match(/^2/)) {
-        var error = new Error(response);
+        var error = new DaybedError({
+          status: req.status,
+          message: req.statusText,
+          response: response,
+        });
         console.error(error);
-        reject(error, req);
+        reject(error);
         return;
       }
 
@@ -53,9 +70,14 @@ function request(options) {
     };
 
     req.onerror = req.ontimeout = function(event) {
-      var error = new Error(event.target.status);
+      console.log(event);
+      var error = new DaybedError({
+          status: event.target.status,
+          message: event.target.statusText,
+          response: event.target,
+      });
       console.error(error);
-      reject(error, req);
+      reject(error);
     };
 
     // Run request
