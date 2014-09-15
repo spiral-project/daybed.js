@@ -130,7 +130,6 @@ $(document).ready(function() {
 
                 var action = isNew ? 'renderEvent' : 'updateEvent';
                 _calendar.fullCalendar(action, event);
-
                 $dialog.dialog('close');
             };
 
