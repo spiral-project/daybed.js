@@ -287,7 +287,7 @@ Session.prototype = {
         }
         else {
           console.debug("Model", modelId, "already exists.");
-          return self.getModel(modelId);
+          return self.getDefinition(modelId);
         }
       });
       return Promise.all(addMissingModels);

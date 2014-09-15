@@ -140,7 +140,7 @@ describe('Daybed.Session', function() {
 
         it("should save only those missing", function (done) {
             server.respondWith("GET", "/v1/models", '{ "models": [ {"id": "app:mod1"} ] }');
-            server.respondWith("GET", "/v1/models/app:mod1", '{ "title": "a", "definition": {} }');
+            server.respondWith("GET", "/v1/models/app:mod1/definition", '{ "title": "a", "definition": {} }');
             server.respondWith("PUT", "/v1/models/app:mod2", '{ "title": "b", "definition": {} }');
 
             session.saveModels({'app:mod1': {}, 'app:mod2': {}})
