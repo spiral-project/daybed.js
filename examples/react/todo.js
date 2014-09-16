@@ -1,5 +1,9 @@
 /** @jsx React.DOM */
 
+var model = 'daybed:examples:react:todo';
+var server = 'https://daybed.lolnet.org';
+
+
 var TodoList = React.createClass({
   render: function() {
     var createItem = function(itemText) {
@@ -17,64 +21,25 @@ var TodoApp = React.createClass({
   },
 
   componentDidMount: function() {
-    var model = this.model = 'daybed:examples:react:todo';
+    var self = this;
 
-    this.connect()
-    .then(function () {
-      return this.session.getRecords(model);
-    }.bind(this))
-    .then(function (response) {
-      this.load(response.records);
-    }.bind(this));
-  },
-
-  connect: function () {
-    var server = 'https://daybed.lolnet.org';
-
-    this.session = null;
-
-    // Reuse previous sessions using localStorage
-    var token = localStorage.getItem(this.model + ':token');
-    var connect = Daybed.startSession(server, { token: token })
+    var store = model + ':token'
+    var token = localStorage.getItem(store);
+    return Daybed.startSession(server, { token: token })
       .then(function (session) {
-        this.session = session;
-        localStorage.setItem(this.model + ':token', session.token);
-        console.log('Session started', session);
-      }.bind(this))
-      .catch(function (e) {
-        console.error('Could not start session.', e);
+        localStorage.setItem(store, session.token);
+        self.session = session;
+      })
+      .then(self.install)
+      .then(function () {
+        return self.session.getRecords(model);
+      })
+      .then(function (response) {
+        var items = response.records.map(function (record) {
+          return record.item;
+        });
+        self.setState({items: items});
       });
-
-    return this.install(connect);
-  },
-
-  install: function (connect) {
-    var models = {};
-    models[this.model] = {
-      definition: {
-        title: 'todo',
-        description: 'Daybed + React',
-        fields : [
-          {name: 'item', type: 'string'},
-        ],
-      },
-      permissions: {
-        'Everyone': ['create_record', 'read_own_records', 'read_definition']
-      }
-    };
-
-    var install = connect.then(function () {
-      return this.session.saveModels(models);
-    }.bind(this));
-
-    return install;
-  },
-
-  load: function (records) {
-    var items = records.map(function (record) {
-      return record.item;
-    });
-    this.setState({items: items});
   },
 
   onTextChange: function(e) {
@@ -88,7 +53,7 @@ var TodoApp = React.createClass({
     var nextText = '';
     this.setState({items: nextItems, text: nextText});
 
-    this.session.saveRecord(this.model, {item: this.state.text});
+    this.session.saveRecord(model, {item: this.state.text});
   },
 
   render: function() {
@@ -102,6 +67,25 @@ var TodoApp = React.createClass({
         </form>
       </div>
     );
-  }
+  },
+
+  install: function () {
+    var models = {};
+    models[model] = {
+      definition: {
+        title: 'todo',
+        description: 'Daybed + React',
+        fields : [
+          {name: 'item', type: 'string'},
+        ],
+      },
+      permissions: {
+        'Everyone': ['create_record', 'read_own_records', 'read_definition']
+      }
+    };
+
+    return this.session.saveModels(models);
+  },
+
 });
 React.renderComponent(<TodoApp />, document.getElementById('todo'));
