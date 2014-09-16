@@ -124,13 +124,16 @@ $(document).ready(function() {
                 event['title'] = $dialog.find('#title').val();
 
                 _session.saveRecord(model, event)
+                .then(function (response) {
+                    $dialog.dialog('close');
+
+                    event.id = response.id;
+                    var action = isNew ? 'renderEvent' : 'updateEvent';
+                    _calendar.fullCalendar(action, event);
+                })
                 .catch(function (e) {
                     console.error("Could not save event", e);
                 });
-
-                var action = isNew ? 'renderEvent' : 'updateEvent';
-                _calendar.fullCalendar(action, event);
-                $dialog.dialog('close');
             };
 
             return actions;
