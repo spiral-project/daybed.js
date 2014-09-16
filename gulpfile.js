@@ -12,7 +12,7 @@ var opt = {
   outputFolder: "build",
 
   app: {
-    src: ["./index.js", "./ext/hkdf.js"],
+    src: ["./index.js", "./ext/utils.js", "./ext/hkdf.js"],
     dest: "daybed.js"
   },
 };

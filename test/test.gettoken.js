@@ -7,6 +7,7 @@ describe('Daybed.getToken', function() {
 
     beforeEach(function () {
         server = sinon.fakeServer.create();
+        server.autoRespond = true;
     });
 
     afterEach(function () {
@@ -28,7 +29,6 @@ describe('Daybed.getToken', function() {
                 assert.equal(data.credentials.id, 3.14);
                 done();
             });
-            server.respond();
         });
 
         it("should requests a new one if credentials are incomplete", function(done) {
@@ -39,7 +39,6 @@ describe('Daybed.getToken', function() {
                 assert.equal(data.credentials.id, 3.14);
                 done();
             });
-            server.respond();
         });
     });
 
@@ -52,11 +51,7 @@ describe('Daybed.getToken', function() {
             .then(function (data) {
                 assert.equal(data.credentials.id, 3.14);
                 done();
-            })
-            .catch(function(error) {
-                console.log(error);
             });
-            server.respond();
         });
     });
 });

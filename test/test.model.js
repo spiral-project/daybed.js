@@ -40,7 +40,5 @@ describe('Daybed.Model', function() {
                 assert.equal(model.session, session);
                 done();
              });
-
-        server.respond();
     });
 });
