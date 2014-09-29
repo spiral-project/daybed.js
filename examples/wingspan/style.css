@@ -1,0 +1,16 @@
+.MyForm {
+    display: table;
+    padding: 10px;
+}
+
+.MyForm > div {
+    display: table-cell;
+    width: 50%;
+    padding: 10px;
+}
+
+.MyForm > pre {
+    display: table-cell;
+    vertical-align: top;
+    padding: 10px;
+}
