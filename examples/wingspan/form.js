@@ -77,6 +77,9 @@ var AutoField = WingspanForms.AutoField;
 var model = 'todo';
 var server = 'https://daybed.lolnet.org';
 
+
+WingspanForms.ControlCommon.attachFormTooltips($(document.body));
+
 React.renderComponent(
     <div className="MyForm">
         <ModelForm server={server} model={model} />
