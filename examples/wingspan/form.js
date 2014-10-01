@@ -24,11 +24,15 @@ var ModelForm = React.createClass({
             }.bind(this));
 
         function _fieldSchema(field) {
-            return {
+            var formField = {
                 dataType: 'text',
                 label: field.label,
                 name: field.name
             };
+            if (/date|boolean/.test(field.type)) {
+                formField.dataType = field.type;
+            }
+            return formField;
         }
 
         this.validate = _.debounce(this.validate, 500);
@@ -66,7 +70,7 @@ var ModelForm = React.createClass({
     },
 
     validate: function() {
-        this.setState({busy: true});
+        this.setState({busy: true, errors: {}});
         this.session.validateRecord(this.props.model, this.state.record)
             .catch(function (error) {
                 var errors = {};
@@ -81,7 +85,7 @@ var ModelForm = React.createClass({
 
 var AutoField = WingspanForms.AutoField;
 
-var model = 'todo';
+var model = 'daybed:examples:ticket';
 var server = 'https://daybed.lolnet.org';
 
 
