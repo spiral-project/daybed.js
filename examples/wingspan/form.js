@@ -4,22 +4,23 @@ var ModelForm = React.createClass({
 
     getInitialState: function () {
         return {
-            fields: {},
+            definition: {},
             record: {},
             errors: {},
         };
     },
 
     componentDidMount: function() {
+        this.fields = {};
+
         this.session = new Daybed.Session(this.props.server);
 
         this.session.getDefinition(this.props.model)
             .then(function (definition) {
-                var fields = {};
                 _.each(definition.fields, function (field) {
-                    fields[field.name] = _fieldSchema(field);
-                });
-                this.setState({fields: fields});
+                    this.fields[field.name] = _fieldSchema(field);
+                }.bind(this));
+                this.setState({definition: definition});
             }.bind(this));
 
         function _fieldSchema(field) {
@@ -36,7 +37,7 @@ var ModelForm = React.createClass({
     render: function () {
         var errors = this.state.errors;
 
-        var controls = _.map(this.state.fields, function (fieldInfo) {
+        var controls = _.map(this.fields, function (fieldInfo) {
             var msg = this.state.busy ? '' : errors[fieldInfo.name] || '',
                 fieldValid = [!msg, msg],
                 fieldValue = this.state.record[fieldInfo.name];
@@ -49,7 +50,13 @@ var ModelForm = React.createClass({
             );
         }.bind(this));
 
-        return <div>{controls}</div>;
+        return (
+            <div>
+                <h2>{this.state.definition.title}</h2>
+                <p>{this.state.definition.description}</p>
+                <div>{controls}</div>
+            </div>
+        );
     },
 
     onFieldChange: function (fieldName, value) {
