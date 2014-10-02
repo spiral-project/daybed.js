@@ -1,0 +1,16 @@
+<div class="ui huge teal header">Daybed Wishlists</div>
+
+<div class="ui input">
+  <input ng-model="name" type="text" placeholder="New wishlist">
+</div>
+<div ng-click="create()" class="ui button positive">
+  <i class="add icon"></i> Create
+</div>
+
+<div class="ui divided list">
+  <div ng-repeat="wishlist in wishlists" class="item teal">
+    <a href="#{{wishlist.id}}">
+      {{wishlist.name}}
+    </a>
+  </div>
+</div>
