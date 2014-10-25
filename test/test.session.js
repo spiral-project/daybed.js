@@ -112,19 +112,6 @@ describe('Daybed.Session', function() {
 
     describe('Save models', function() {
 
-        it("should save permissions if specified", function (done) {
-            server.respondWith("PUT", "/v1/models/app:test", '{ "definition": {} }');
-            server.respondWith("PATCH", "/v1/models/app:test/permissions", '{ "userid": ["read_all_records"] }');
-
-            var example = {definition: {}, permissions: {"Everyone": ["+ALL"]}};
-
-            session.saveModel('app:test', example)
-            .then(function (permissions) {
-                assert.deepEqual(permissions['userid'], ['read_all_records']);
-                done();
-            });
-        });
-
         it("should save all specified models", function (done) {
             server.respondWith("GET", "/v1/models", '{ "models": [] }');
             server.respondWith("PUT", "/v1/models/app:mod1", '{ "title": "a", "definition": {} }');

@@ -259,14 +259,6 @@ Session.prototype = {
       credentials: this.credentials
     });
 
-    if (model.permissions) {
-      // So far, Daybed does not handle permissions during model creation
-      // see https://github.com/spiral-project/daybed/pull/230
-      create = create.then(function () {
-        return this.savePermissions(modelId, model.permissions);
-      }.bind(this));
-    }
-
     return create;
   },
 
