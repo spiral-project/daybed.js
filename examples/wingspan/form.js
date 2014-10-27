@@ -95,5 +95,5 @@ React.renderComponent(
     <div className="MyForm">
         <ModelForm server={server} model={model} />
     </div>,
-    document.getElementById('wishlist')
+    document.getElementById('ticket-form')
 );
