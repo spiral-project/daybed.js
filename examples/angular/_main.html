@@ -1,0 +1,79 @@
+<div class="ui pointing menu">
+  <a href="#" class="item">
+    <i class="home icon"></i>
+  </a>
+  <a class="item active">
+    <i class="heart empty icon"></i> {{master.name}}
+  </a>
+  <div class="item">
+    <div class="field">
+      <i class="url icon"></i>
+      <input type="text" value="{{urls.share}}" select-on-click>
+      <div class="ui pointing left blue label">Share URL</div>
+    </div>
+  </div>
+  <div ng-if="!readonly" class="right menu">
+    <div class="item">
+      <div class="field">
+        <div class="ui pointing right orange label">Admin URL</div>
+        <input type="text" value="{{urls.admin}}" select-on-click>
+        <i class="edit icon"></i>
+      </div>
+    </div>
+    <div class="item">
+      <div ng-click="deleteWishlist()" class="ui negative button">
+        <i class="trash icon"></i>
+        Delete
+      </div>
+    </div>
+  </div>
+</div>
+
+<div ng-if="error" class="ui ignored red message">{{error.message}}</div>
+
+<div class="ui stackable items">
+  <div ng-if="!readonly" class="item">
+    <div class="ui form" ng-class="{true: 'loading'}[loading]">
+      <div class="field">
+        <label>Title</label>
+        <div class="ui left labeled input">
+          <input ng-model="wish.title" type="text" placeholder="Your wish" required>
+          <div class="ui corner label">
+            <i class="icon asterisk"></i>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Photo</label>
+        <div class="ui left labeled icon input">
+          <input ng-model="wish.photo" type="text" placeholder="http://server.org/image.jpg">
+          <i class="photo icon"></i>
+        </div>
+      </div>
+      <div class="field">
+        <label>Details</label>
+        <div class="ui left labeled icon input">
+          <textarea ng-model="wish.details"></textarea>
+        </div>
+      </div>
+      <a ng-click="addWish()" class="ui blue submit button">
+        <i class="add icon"></i>
+        Add
+      </a>
+    </div>
+  </div>
+
+  <div ng-repeat="item in master.items" class="item">
+    <div class="image">
+      <img src="{{item.photo || defaultphoto }}">
+      <a ng-if="!readonly" ng-click="deleteWish($index)" class="ui corner label">
+        <i class="delete icon"></i>
+      </a>
+    </div>
+    <div class="content">
+      <div class="meta">{{item.date | date:'yyyy-MM-dd'}}</div>
+      <div class="name">{{item.title}}</div>
+      <p class="description">{{item.details}}</p>
+    </div>
+  </div>
+</div>
