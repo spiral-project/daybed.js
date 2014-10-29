@@ -115,22 +115,17 @@ wishlistApp.factory('wishlistData', function($rootScope) {
     // This piece of code uses ``$rootScope`` from closure, and forces dirty checking
     // when the *daybed.js* promises are resolved/rejected.
     Promise.prototype.thenApply = function (onFulfilled, onRejected) {
-        Promise.prototype.then.call(this,
-            function onSuccess() {
-                if (!onFulfilled) return;
+        Promise.prototype.then.call(this, applied(onFulfilled), applied(onRejected));
+
+        function applied(cb) {
+            return function () {
+                if (!cb) return;
                 var args = arguments;
                 $rootScope.$apply(function() {
-                    onFulfilled.apply(this, args);
+                    cb.apply(this, args);
                 });
-            },
-            function onError() {
-                if (!onRejected) return;
-                var args = arguments;
-                $rootScope.$apply(function() {
-                    onRejected.apply(this, args);
-                });
-            }
-        );
+            };
+        }
     };
 
 
