@@ -171,15 +171,23 @@ function spore(host) {
 function startSession(host, options) {
   options = options || {};
 
+  if (options.createSession === undefined) {
+    options.createSession = true;
+  }
+
   var credentials = _credentials(options);
 
+  if (!options.createSession) {
+    return new Promise(function(resolve, reject) { resolve(new Session(host)) });
+  }
+
   return getToken(host, {credentials: credentials})
-  .then(function (data) {
-    return new Session(host, data);
-  })
-  .catch(function (error) {
-    throw error;
-  });
+    .then(function (data) {
+      return new Session(host, data);
+    })
+    .catch(function(error) {
+      throw error;
+    });
 }
 
 function Session(host, options) {

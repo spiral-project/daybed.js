@@ -23,6 +23,14 @@ describe('Daybed.startSession', function() {
         });
     });
 
+    it("should not create a new token if no credentials but createSession is false",
+      function (done) {
+        Daybed.startSession('', {createSession: false}).then(function (session) {
+            assert.equal(session.credentials, undefined);
+            done();
+        });
+    });
+
     it("should validate credentials if specified", function (done) {
         server.respondWith("GET", "/v1/token", '{ "credentials": { "id": 3.14, "key": "abc" } }');
 
