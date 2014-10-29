@@ -171,14 +171,12 @@ function spore(host) {
 function startSession(host, options) {
   options = options || {};
 
-  if (options.createSession === undefined) {
-    options.createSession = true;
-  }
-
   var credentials = _credentials(options);
 
-  if (!options.createSession) {
-    return new Promise(function(resolve, reject) { resolve(new Session(host)) });
+  if (options.anonymous) {
+    return new Promise(function(resolve, reject) {
+      resolve(new Session(host));
+    });
   }
 
   return getToken(host, {credentials: credentials})

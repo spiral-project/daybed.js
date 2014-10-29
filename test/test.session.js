@@ -23,9 +23,9 @@ describe('Daybed.startSession', function() {
         });
     });
 
-    it("should not create a new token if no credentials but createSession is false",
+    it("should not create a new token if anonymous session",
       function (done) {
-        Daybed.startSession('', {createSession: false}).then(function (session) {
+        Daybed.startSession('', {anonymous: true}).then(function (session) {
             assert.equal(session.credentials, undefined);
             done();
         });
