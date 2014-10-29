@@ -60,7 +60,6 @@ function request(options) {
           message: req.statusText,
           response: response,
         });
-        console.error(error);
         reject(error);
         return;
       }
@@ -70,13 +69,11 @@ function request(options) {
     };
 
     req.onerror = req.ontimeout = function(event) {
-      console.log(event);
       var error = new DaybedError({
           status: event.target.status,
           message: event.target.statusText,
           response: event.target,
       });
-      console.error(error);
       reject(error);
     };
 
