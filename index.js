@@ -170,13 +170,19 @@ function startSession(host, options) {
 
   var credentials = _credentials(options);
 
+  if (options.anonymous) {
+    return new Promise(function(resolve, reject) {
+      resolve(new Session(host));
+    });
+  }
+
   return getToken(host, {credentials: credentials})
-  .then(function (data) {
-    return new Session(host, data);
-  })
-  .catch(function (error) {
-    throw error;
-  });
+    .then(function (data) {
+      return new Session(host, data);
+    })
+    .catch(function(error) {
+      throw error;
+    });
 }
 
 function Session(host, options) {
