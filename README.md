@@ -3,6 +3,7 @@
 A library to use [Daybed](http://daybed.readthedocs.org) in your Javascript
 applications.
 
+[![NPM Version](https://img.shields.io/npm/v/daybed.js.svg?style=flat)](https://npmjs.org/package/daybed.js)
 [![Build Status](https://travis-ci.org/spiral-project/daybed.js.png?branch=master)](https://travis-ci.org/spiral-project/daybed.js)
 
 
