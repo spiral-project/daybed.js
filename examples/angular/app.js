@@ -18,10 +18,8 @@ wishlistApp.controller('HomeCtrl', function ($scope, $location, $routeParams, wi
 
     wishlistData
         .fetch()
-        .then(function(response) {
-            $scope.$apply(function () {
-                $scope.wishlists = response.records;
-            });
+        .thenApply(function(response) {
+            $scope.wishlists = response.records;
         });
 
     $scope.create = function () {
@@ -31,11 +29,9 @@ wishlistApp.controller('HomeCtrl', function ($scope, $location, $routeParams, wi
         };
         wishlistData
             .save(record)
-            .then(function(response) {
+            .thenApply(function(response) {
                 var adminToken = wishlistData.token();
-                $scope.$apply(function () {
-                    $location.url('/' + response.id + '?token=' + adminToken);
-                });
+                $location.url('/' + response.id + '?token=' + adminToken);
             });
     };
 });
@@ -58,17 +54,13 @@ wishlistApp.controller('MainCtrl', function ($scope, $location, $routeParams, wi
     wishlistData
         .token(adminToken)
         .get($routeParams.id)
-        .then(function(response) {
-            $scope.$apply(function () {
-                $scope.master = response;
-            });
-        })
-        .catch(function (e) {
+        .thenApply(function(response) {
+            $scope.master = response;
+        },
+        function (e) {
             // Redirect to Home if wishlist unknown
             if (e.status == 404) {
-                $scope.$apply(function () {
-                    $location.url('/');
-                });
+                $location.url('/');
             }
         });
 
@@ -77,10 +69,8 @@ wishlistApp.controller('MainCtrl', function ($scope, $location, $routeParams, wi
         if (window.confirm("Do you really want to delete this wishlist?")) {
             wishlistData
                 .delete($scope.master.id)
-                .then(function() {
-                    $scope.$apply(function () {
-                        $location.url('/');
-                    });
+                .thenApply(function() {
+                    $location.url('/');
                 });
         }
     };
@@ -105,21 +95,40 @@ wishlistApp.controller('MainCtrl', function ($scope, $location, $routeParams, wi
         var wishlist = angular.copy($scope.master);
         wishlistData
             .save(wishlist)
-            .then(function () {
-                $scope.$apply(function () {
-                    $scope.loading = false;
-                });
-            })
-            .catch(function(error) {
-                $scope.$apply(function () {
-                    $scope.error = error;
-                });
+            .thenApply(function () {
+                $scope.loading = false;
+            },
+            function(error) {
+                $scope.error = error;
             });
     }
 });
 
 
-wishlistApp.factory('wishlistData', function() {
+wishlistApp.factory('wishlistData', function($rootScope) {
+
+    // In this provider, we don't use $http, since we demo the integration
+    // of daybed.js with Angular.
+    // Hence, we don't benefit of Angular automatic dirty checking done here:
+    // https://github.com/angular/angular.js/blob/v1.2.26/src/ng/http.js#L1012-L1013
+    //
+    // This piece of code uses ``$rootScope`` from closure, and forces dirty checking
+    // when the *daybed.js* promises are resolved/rejected.
+    Promise.prototype.thenApply = function (onFulfilled, onRejected) {
+        Promise.prototype.then.call(this, applied(onFulfilled), applied(onRejected));
+
+        function applied(cb) {
+            return function () {
+                if (!cb) return;
+                var args = arguments;
+                $rootScope.$apply(function() {
+                    cb.apply(this, args);
+                });
+            };
+        }
+    };
+
+
     var server = 'https://daybed.lolnet.org';
     var model = 'daybed:examples:wishlist';
 
