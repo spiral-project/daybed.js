@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
 var model = 'daybed:examples:react:todo';
-var server = 'https://daybed.lolnet.org';
+var server = 'https://daybed.io';
 
 
 var TodoList = React.createClass({

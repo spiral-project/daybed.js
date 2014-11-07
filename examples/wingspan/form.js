@@ -86,7 +86,7 @@ var ModelForm = React.createClass({
 var AutoField = WingspanForms.AutoField;
 
 var model = 'daybed:examples:ticket';
-var server = 'https://daybed.lolnet.org';
+var server = 'https://daybed.io';
 
 
 WingspanForms.ControlCommon.attachFormTooltips($(document.body));

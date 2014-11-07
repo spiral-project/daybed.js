@@ -3,6 +3,7 @@
 A library to use [Daybed](http://daybed.readthedocs.org) in your Javascript
 applications.
 
+[![NPM Version](https://img.shields.io/npm/v/daybed.js.svg?style=flat)](https://npmjs.org/package/daybed.js)
 [![Build Status](https://travis-ci.org/spiral-project/daybed.js.png?branch=master)](https://travis-ci.org/spiral-project/daybed.js)
 
 
@@ -37,7 +38,7 @@ First, we start a new session on Daybed, and keep the token as if it was an *adm
 
 ```javascript
 
-    var server = 'https://daybed.lolnet.org/v1/';
+    var server = 'https://daybed.lolnet.org';
     var session = Daybed.startSession(server)
                         .then(function (session) {
                           console.log("Keep this somewhere safe " + session.token);
