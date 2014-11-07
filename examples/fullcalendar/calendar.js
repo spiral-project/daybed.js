@@ -1,6 +1,6 @@
 $(document).ready(function() {
 
-    var server = 'https://daybed.lolnet.org';
+    var server = 'https://daybed.io';
     var model = 'daybed:examples:fullcalendar';
 
     var _calendar,

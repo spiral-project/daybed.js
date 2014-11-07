@@ -129,7 +129,7 @@ wishlistApp.factory('wishlistData', function($rootScope) {
     };
 
 
-    var server = 'https://daybed.lolnet.org';
+    var server = 'https://daybed.io';
     var model = 'daybed:examples:wishlist';
 
     var _sessionPromise;
