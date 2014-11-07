@@ -38,7 +38,7 @@ First, we start a new session on Daybed, and keep the token as if it was an *adm
 
 ```javascript
 
-    var server = 'https://daybed.lolnet.org/v1/';
+    var server = 'https://daybed.lolnet.org';
     var session = Daybed.startSession(server)
                         .then(function (session) {
                           console.log("Keep this somewhere safe " + session.token);
