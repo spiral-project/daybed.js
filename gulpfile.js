@@ -5,8 +5,6 @@
 var gulp = require("gulp");
 var browserify = require('browserify');
 var source = require('vinyl-source-stream');
-var uglify = require('gulp-uglify');
-var deploy = require("gulp-gh-pages");
 
 var opt = {
   outputFolder: "build",
@@ -26,19 +24,6 @@ gulp.task("dist", function() {
     .bundle(opt.bundle)
     .pipe(source(opt.app.dest))
     .pipe(gulp.dest(opt.outputFolder));
-});
-
-gulp.task("cname", function() {
-  return gulp.src("CNAME")
-    .pipe(gulp.dest(opt.outputFolder));
-});
-
-/**
- * Deploy to gh-pages
- */
-gulp.task("deploy", ["dist", "cname"], function() {
-  gulp.src("./build/**")
-      .pipe(deploy("git@github.com:spiral-project/daybed.js.git"));
 });
 
 gulp.task("default", ["dist"]);
