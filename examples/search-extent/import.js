@@ -10,7 +10,7 @@ var model = {
       title: 'Daybed + ElasticSearch + Spatial',
       description: 'Search extent',
       fields: [
-        {name: 'name', type: 'string'},
+        {name: 'name', type: 'string', required: false},
         {name: 'location', type: 'point'},
       ]
     },
@@ -32,7 +32,7 @@ function saveGeoJSON(geojson) {
     return {
       id: feature.id,
       location: feature.geometry.coordinates,
-      name: feature.properties.name || 'Unknown',
+      name: feature.properties.name,
     };
   });
 
