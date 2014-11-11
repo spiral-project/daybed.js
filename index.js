@@ -344,6 +344,16 @@ Session.prototype = {
     });
   },
 
+  searchRecords: function(modelId, query) {
+    return request({
+      method: "POST",
+      host: this.host,
+      url: "/models/" + this._prefixed(modelId) + "/search/",
+      credentials: this.credentials,
+      body: query
+    });
+  },
+
   _getMultiRecords: function(modelsIds) {
     var data = {};
     var getRecords = modelsIds.map(function(modelId) {
