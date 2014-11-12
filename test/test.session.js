@@ -242,6 +242,18 @@ describe('Daybed.Session', function() {
                 done();
             });
         });
+
+        it("should send accept format header if specified", function (done) {
+            server.respondWith("GET", "/v1/models/app:test/records", '{ "records": [ {"id": 1} ] }');
+
+            session.getRecords('app:test', {format: 'application/csv'})
+            .then(function (response) {
+                var headers = server.requests[0].requestHeaders;
+                assert.equal(headers['Accept'], 'application/csv');
+                assert.equal(headers['Content-Type'], 'application/csv');
+                done();
+            });
+        });
     });
 
 
@@ -339,6 +351,21 @@ describe('Daybed.Session', function() {
                 assert.deepEqual(response, { "records": [] });
                 done();
             });
+        });
+    });
+
+
+    describe('Search records', function() {
+
+        it("should post the specified query", function (done) {
+            server.respondWith("POST", "/v1/models/test/search/", '{ "hits": [] }');
+
+            session.searchRecords('test', {filtered: "query"})
+              .then(function (model) {
+                var request = server.requests[0];
+                assert.equal(request.requestBody, '{\"filtered\":\"query\"}');
+                done();
+              });
         });
     });
 
