@@ -30,8 +30,8 @@ function request(options) {
     var req = new XMLHttpRequest();
     options.url = options.host + '/v1' + options.url;
     req.open(options.method, options.url, true);
-    req.setRequestHeader('Content-Type', 'application/json');
-    req.setRequestHeader('Accept', 'application/json');
+    req.setRequestHeader('Content-Type', options.format || 'application/json');
+    req.setRequestHeader('Accept', options.format || 'application/json');
     req.responseType = 'json';
     req.timeout = TIMEOUT;
 
@@ -334,7 +334,9 @@ Session.prototype = {
     });
   },
 
-  getRecords: function(modelId) {
+  getRecords: function(modelId, options) {
+    options = options || {};
+
     if (modelId.constructor == Array) {
       return this._getMultiRecords(modelId);
     }
@@ -343,7 +345,18 @@ Session.prototype = {
       method: "GET",
       host: this.host,
       url: "/models/" + this._prefixed(modelId) + "/records",
-      credentials: this.credentials
+      credentials: this.credentials,
+      format: options.format
+    });
+  },
+
+  searchRecords: function(modelId, query) {
+    return request({
+      method: "POST",
+      host: this.host,
+      url: "/models/" + this._prefixed(modelId) + "/search/",
+      credentials: this.credentials,
+      body: query
     });
   },
 
