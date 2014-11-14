@@ -1,1 +1,6 @@
 language: node_js
+env:
+    - TEST_ENV=node
+    - TEST_ENV=browser
+script:
+    make test-$TEST_ENV

@@ -16,7 +16,12 @@ dist:
 deploy:
 	npm run deploy
 
-test: install dist
+test: test-node test-browser
+
+test-node: install
+	@./node_modules/mocha/bin/mocha --require test/init.js test/test.*.js
+
+test-browser: install dist
 	@./node_modules/mocha-phantomjs/bin/mocha-phantomjs test/index.html
 
 clean:
