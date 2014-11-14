@@ -1,5 +1,10 @@
 "use strict";
 
+var isNode = (typeof process !== 'undefined' && process.title === 'node');
+if (isNode) {
+    global.XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+}
+
 var Promise = require('promise-polyfill');
 var utils = require('./ext/utils.js');
 var console = require("console");

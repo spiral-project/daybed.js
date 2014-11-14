@@ -22,6 +22,7 @@ var opt = {
 
 gulp.task("dist", function() {
   return browserify(opt.app.src)
+    .ignore('xmlhttprequest')
     .bundle(opt.bundle)
     .pipe(source(opt.app.dest))
     .pipe(gulp.dest(opt.outputFolder));
