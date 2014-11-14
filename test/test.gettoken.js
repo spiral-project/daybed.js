@@ -20,18 +20,18 @@ describe('Daybed.getToken', function() {
         });
 
         it("should requests a new one if no credentials are specified", function(done) {
-            server.respondWith("POST", "/v1/tokens", '{ "credentials": { "id": 3.14 } }');
+            server.respondWith("POST", "http://server/v1/tokens", '{ "credentials": { "id": 3.14 } }');
 
-            Daybed.getToken('').then(function (data) {
+            Daybed.getToken('http://server').then(function (data) {
                 assert.equal(data.credentials.id, 3.14);
                 done();
             });
         });
 
         it("should requests a new one if credentials are incomplete", function(done) {
-            server.respondWith("POST", "/v1/tokens", '{ "credentials": { "id": 3.14 } }');
+            server.respondWith("POST", "http://server/v1/tokens", '{ "credentials": { "id": 3.14 } }');
 
-            Daybed.getToken('', {credentials: {id: 1}})
+            Daybed.getToken('http://server', {credentials: {id: 1}})
             .then(function (data) {
                 assert.equal(data.credentials.id, 3.14);
                 done();
@@ -42,9 +42,9 @@ describe('Daybed.getToken', function() {
     describe('Validation', function() {
 
         it("should validate credentials on server if specified correctly", function(done) {
-            server.respondWith("GET", "/v1/token", '{ "credentials": { "id": 3.14 } }');
+            server.respondWith("GET", "http://server/v1/token", '{ "credentials": { "id": 3.14 } }');
 
-            Daybed.getToken('', {credentials: {id: 'abc', key: 'xyz'}})
+            Daybed.getToken('http://server', {credentials: {id: 'abc', key: 'xyz'}})
             .then(function (data) {
                 assert.equal(data.credentials.id, 3.14);
                 done();

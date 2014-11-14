@@ -14,21 +14,21 @@ describe('Hello page', function() {
     });
 
     it("should fetch hello from server", function (done) {
-        server.respondWith("GET", "/v1/", '{ "version": 1.0 }');
+        server.respondWith("GET", "http://server/v1/", '{ "version": 1.0 }');
 
-        Daybed.hello('').then(function (data) {
+        Daybed.hello('http://server').then(function (data) {
             assert.equal(data.version, 1.0);
             done();
         });
     });
 
     it("should survive server errors", function (done) {
-        server.respondWith("GET", "/v1/", [500, '', '{ "message": "Server down" }']);
+        server.respondWith("GET", "http://server/v1/", [500, '', '{ "message": "Server down" }']);
 
         sandbox.stub(console, 'warn');
         sandbox.stub(console, 'error');
 
-        Daybed.hello('').catch(function (error) {
+        Daybed.hello('http://server').catch(function (error) {
             assert.equal(error.name, "DaybedError");
             assert.equal(error.status, 500);
             assert.equal(error.message, 'Internal Server Error');
@@ -39,12 +39,12 @@ describe('Hello page', function() {
     });
 
     it("should survive client-side errors", function (done) {
-        server.respondWith("GET", "/v1/", '{ "hello": "Daybed" }');
+        server.respondWith("GET", "http://server/v1/", '{ "hello": "Daybed" }');
 
         var failing = sandbox.stub(XMLHttpRequest.prototype, 'setRequestHeader');
         failing.throws();
 
-        Daybed.hello('').catch(function (error) {
+        Daybed.hello('http://server').catch(function (error) {
             assert.equal(error.name, 'Error');
             assert.equal(error.message, 'Error');
             assert.isUndefined(error.status, 500);
