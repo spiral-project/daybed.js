@@ -1,5 +1,6 @@
 "use strict";
 
+var Promise = require('promise-polyfill');
 var utils = require('./ext/utils.js');
 var console = require("console");
 var hawk = require('hawk');
