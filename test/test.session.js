@@ -1,6 +1,3 @@
-var assert = chai.assert;
-
-
 describe('Daybed.startSession', function() {
 
     var server;

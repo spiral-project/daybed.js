@@ -1,5 +1,11 @@
 "use strict";
 
+var isNode = (typeof process !== 'undefined' && process.title === 'node');
+if (isNode) {
+    global.XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+}
+
+var Promise = require('promise-polyfill');
 var utils = require('./ext/utils.js');
 var console = require("console");
 var hawk = require('hawk');
@@ -97,7 +103,7 @@ function _credentials(hawkinfo) {
   var token = typeof(hawkinfo.token) == 'function' ? hawkinfo.token()
                                                    : hawkinfo.token;
 
-  // Derive credentials with hdfk
+  // Derive credentials with hkdf
   if (!credentials && token) {
     deriveHawkCredentials(token, 'sessionToken', 32*2, function (creds) {
       credentials = creds;
@@ -576,5 +582,4 @@ var Daybed = {
   Model: Model
 };
 
-window.Daybed = Daybed;
 module.exports = Daybed;

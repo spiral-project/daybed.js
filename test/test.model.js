@@ -1,6 +1,3 @@
-var assert = chai.assert;
-
-
 describe('Daybed.Model', function() {
 
     var server;

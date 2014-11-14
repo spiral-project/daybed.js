@@ -10,17 +10,20 @@ var deploy = require("gulp-gh-pages");
 
 var opt = {
   outputFolder: "build",
-
   app: {
-    src: ["./index.js", "./ext/utils.js", "./ext/hkdf.js"],
+    src: "./index.js",
     dest: "daybed.js"
   },
+  bundle: {
+    standalone: 'Daybed'
+  }
 };
 
 
 gulp.task("dist", function() {
   return browserify(opt.app.src)
-    .bundle()
+    .ignore('xmlhttprequest')
+    .bundle(opt.bundle)
     .pipe(source(opt.app.dest))
     .pipe(gulp.dest(opt.outputFolder));
 });
