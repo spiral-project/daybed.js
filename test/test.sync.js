@@ -1,6 +1,3 @@
-var assert = chai.assert;
-
-
 describe('Records synchronization', function() {
 
     var server;

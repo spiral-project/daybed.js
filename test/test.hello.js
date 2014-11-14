@@ -1,5 +1,3 @@
-var assert = chai.assert;
-
 describe('Hello page', function() {
     var server;
     var sandbox;
