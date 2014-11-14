@@ -7,6 +7,21 @@ applications.
 [![Build Status](https://travis-ci.org/spiral-project/daybed.js.png?branch=master)](https://travis-ci.org/spiral-project/daybed.js)
 
 
+## Usage
+
+In the browser, just include the source file:
+
+```html
+  <script src="//spiral-project.github.io/daybed.js/build/daybed.js"></script>
+```
+
+In node, just require the package:
+
+```javascript
+  var Daybed = require('daybed.js');
+```
+
+
 ## Rationale
 
 Note that **Daybed** is a REST backend, and does not require any particular library
