@@ -114,12 +114,12 @@ wishlistApp.factory('wishlistData', function($rootScope) {
     //
     // This piece of code uses ``$rootScope`` from closure, and forces dirty checking
     // when the *daybed.js* promises are resolved/rejected.
-    Promise.prototype.thenApply = function (onFulfilled, onRejected) {
-        Promise.prototype.then.call(this, applied(onFulfilled), applied(onRejected));
+    var thenApply = function (onFulfilled, onRejected) {
+        this.then(applied(onFulfilled), applied(onRejected));
 
         function applied(cb) {
+            if (!cb) return cb;
             return function () {
-                if (!cb) return;
                 var args = arguments;
                 $rootScope.$apply(function() {
                     cb.apply(this, args);
@@ -141,6 +141,9 @@ wishlistApp.factory('wishlistData', function($rootScope) {
                 .then(function (session) {
                     return session;
                 });
+
+            // Either native Promise or promise-polyfill
+            _sessionPromise.constructor.prototype.thenApply = thenApply;
         }
         return _sessionPromise;
     }
