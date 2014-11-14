@@ -10,8 +10,10 @@
     "url": "git@github.com:spiral-project/daybed.js.git"
   },
   "scripts": {
+    "deploy": "gulp deploy",
+    "dist": "gulp dist",
     "test": "make test",
-    "dist": "gulp dist"
+    "outdated": "npm outdated --depth 0"
   },
   "dependencies": {
     "hawk": "2.2.*",

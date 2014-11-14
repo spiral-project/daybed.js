@@ -25,10 +25,15 @@ gulp.task("dist", function() {
     .pipe(gulp.dest(opt.outputFolder));
 });
 
+gulp.task("cname", function() {
+  return gulp.src("CNAME")
+    .pipe(gulp.dest(opt.outputFolder));
+});
+
 /**
  * Deploy to gh-pages
  */
-gulp.task("deploy", ["dist"], function() {
+gulp.task("deploy", ["dist", "cname"], function() {
   gulp.src("./build/**")
       .pipe(deploy("git@github.com:spiral-project/daybed.js.git"));
 });
