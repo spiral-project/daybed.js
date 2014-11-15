@@ -13,6 +13,7 @@ var ModelForm = React.createClass({
     componentDidMount: function() {
         this.fields = {};
 
+        // Anonymous session
         this.session = new Daybed.Session(this.props.server);
 
         this.session.getDefinition(this.props.model)
