@@ -11,14 +11,18 @@ $(document).ready(function() {
       .then(init);
 
     //
-    // Get session from URL hash, or create new one
+    // Get session from URL hash, localStorage or create new one if empty
     //
     function connect() {
+        var store = model + ':token';
         var token = window.location.hash.slice(1);
-        return Daybed.startSession(server, { token: token })
+        token = token ? token : localStorage.getItem(store);
+
+        return Daybed.startSession(server, {token: token})
           .then(function (session) {
             _session = session;
             window.location.hash = session.token;
+            localStorage.setItem(store, session.token);
           })
           .catch(function (e) {
             console.error("Could not start session", e);
