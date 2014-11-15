@@ -145,19 +145,6 @@ describe('Daybed.Session', function() {
     });
 
 
-    describe('Load models', function() {
-
-        it("should fetch single model from server", function (done) {
-            server.respondWith("GET", "/v1/models/test", '{ "definition": { "title": "Test" } }');
-
-            session.loadModel('test').then(function (model) {
-                assert.equal(model.definition().title, 'Test');
-                done();
-            });
-        });
-    });
-
-
     describe('Prefixed models', function() {
 
         before(function () {
@@ -171,8 +158,8 @@ describe('Daybed.Session', function() {
         it("should prefix automatically model ids", function (done) {
             server.respondWith("GET", "/v1/models/app:test", '{ "definition": { "title": "Test" } }');
 
-            session.loadModel('test').then(function (model) {
-                assert.equal(model.definition().title, 'Test');
+            session.getModel('test').then(function (model) {
+                assert.equal(model.definition.title, 'Test');
                 done();
             });
         });
@@ -180,8 +167,8 @@ describe('Daybed.Session', function() {
         it("should not add prefix if model id is already prefixed", function (done) {
             server.respondWith("GET", "/v1/models/app:test", '{ "definition": { "title": "Test" } }');
 
-            session.loadModel('app:test').then(function (model) {
-                assert.equal(model.definition().title, 'Test');
+            session.getModel('app:test').then(function (model) {
+                assert.equal(model.definition.title, 'Test');
                 done();
             });
         });
