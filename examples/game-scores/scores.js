@@ -1,7 +1,6 @@
 var model = 'daybed:examples:game:score';
 var server = 'https://daybed.io';
 
-
 // Anonymous session
 var session = new Daybed.Session(server);
 
@@ -21,9 +20,7 @@ function publishScore(score) {
     gamer: gamer || 'Anonymous',
     score: score
   })
-  .then(function () {
-    refreshScores();
-  });
+  .then(refreshScores);
 }
 
 
@@ -36,17 +33,20 @@ function refreshScores() {
     sort: [{score: {order: "desc"}}]
   };
   session.searchRecords(model, query)
-    .then(function (results) {
-      // Build score list in HTML
-      var top10 = '';
-      for (var i=0, n=results.hits.hits.length; i<n; i++) {
-        var s = results.hits.hits[i]._source;
-        top10 += ('<li><strong>' + s.score + '</strong> ' +
-                  s.gamer + ' (' + s.date + ')</li>');
-      }
-      document.getElementById('top10').innerHTML = top10;
-      document.getElementById('total').textContent = results.hits.total;
-    });
+    .then(buildScoreList);
+}
+
+
+function buildScoreList(results) {
+  // Vanilla JS templating!
+  var top10 = '';
+  for (var i=0, n=results.hits.hits.length; i<n; i++) {
+    var s = results.hits.hits[i]._source;
+    top10 += ('<li><strong>' + s.score + '</strong> ' +
+              s.gamer + ' (' + s.date + ')</li>');
+  }
+  document.getElementById('top10').innerHTML = top10;
+  document.getElementById('total').textContent = results.hits.total;
 }
 
 
