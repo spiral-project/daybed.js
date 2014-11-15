@@ -135,17 +135,19 @@ wishlistApp.factory('wishlistData', function($rootScope) {
     var _sessionPromise;
     var _token;
 
-    function session() {
-        if (!_sessionPromise) {
-            _sessionPromise = Daybed.startSession(server, {token: _token})
-                .then(function (session) {
-                    return session;
-                });
-
-            // Either native Promise or promise-polyfill
-            _sessionPromise.constructor.prototype.thenApply = thenApply;
+    function session(anonymous) {
+        var p;
+        if (anonymous) {
+            p = Daybed.startSession(server, {anonymous: true});
         }
-        return _sessionPromise;
+        else {
+            // Reuse promise once authenticated
+            p = _sessionPromise ? _sessionPromise :
+                                  Daybed.startSession(server, {token: _token});
+        }
+        // Either native Promise or promise-polyfill
+        p.constructor.prototype.thenApply = thenApply;
+        return p;
     }
 
     return {
@@ -158,7 +160,7 @@ wishlistApp.factory('wishlistData', function($rootScope) {
         },
 
         fetch: function () {
-            return session()
+            return session(true)
                 .then(function (session) {
                     return session.getRecords(model);
                 })
@@ -171,7 +173,7 @@ wishlistApp.factory('wishlistData', function($rootScope) {
         },
 
         get: function (id) {
-            return session()
+            return session(true)
                 .then(function (session) {
                     return session.getRecord(model, id);
                 });
