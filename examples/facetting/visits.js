@@ -36,11 +36,6 @@ else {
 
 
 //
-// TODO: http://www.elasticsearch.org/blog/data-visualization-elasticsearch-aggregations/
-//
-
-
-//
 // Daybed model to store visits.
 // (function ran manually in inspector only once)
 function install() {
