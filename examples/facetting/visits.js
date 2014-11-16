@@ -28,10 +28,17 @@ if (navigator.doNotTrack === 'yes') {
   console.warn("Do-Not-Track is set.");
 }
 else {
-  (new Daybed.Session(server)).saveRecord(model, visit)
-    .then(function () {
-      console.log("Thanks for your visit !");
-    });
+  var already = localStorage.getItem(model + ':visited');
+  if (already) {
+    console.warn("Already visited");
+  }
+  else {
+    (new Daybed.Session(server)).saveRecord(model, visit)
+      .then(function () {
+        console.log("Thanks for your visit !");
+        localStorage.setItem(model + ':visited', 'yes');
+      });
+  }
 }
 
 
