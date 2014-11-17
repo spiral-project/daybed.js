@@ -16,7 +16,7 @@ $(document).ready(function() {
     function connect() {
         var store = model + ':token';
         var token = window.location.hash.slice(1);
-        token = token ? token : localStorage.getItem(store);
+        token = token || localStorage.getItem(store);
 
         return Daybed.startSession(server, {token: token})
           .then(function (session) {

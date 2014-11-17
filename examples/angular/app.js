@@ -142,8 +142,7 @@ wishlistApp.factory('wishlistData', function($rootScope) {
         }
         else {
             // Reuse promise once authenticated
-            p = _sessionPromise ? _sessionPromise :
-                                  Daybed.startSession(server, {token: _token});
+            p = _sessionPromise || Daybed.startSession(server, {token: _token});
         }
         // Either native Promise or promise-polyfill
         p.constructor.prototype.thenApply = thenApply;
