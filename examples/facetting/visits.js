@@ -16,7 +16,8 @@ var featureFields = [
 var visit = {};
 
 plateformFields.forEach(function (name) {
-    visit[name] = '' + platform[name];
+    visit[name] = name === 'os' ?
+                  platform[name].family : platform[name];
 });
 
 featureFields.forEach(function (name) {
