@@ -13,7 +13,7 @@ var mainState = {
     // Function called first to load all the assets
     preload: function() {
         // Change the background color of the game
-        game.stage.backgroundColor = '#71c5cf';
+        game.stage.backgroundColor = '#AED1B3';
 
         // Load the bird sprite
         game.load.image('bird', 'assets/bird.png');
@@ -49,7 +49,7 @@ var mainState = {
 
         // Add a score label on the top left of the screen
         this.score = 0;
-        this.labelScore = this.game.add.text(20, 20, "0", { font: "30px Sans", fill: "#ffffff" });
+        this.labelScore = this.game.add.text(20, 20, "0", { font: "30px SFPixelateBold", fill: "#ffffff" });
     },
 
     // This function is called 60 times per second

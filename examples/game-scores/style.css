@@ -1,0 +1,45 @@
+body {
+  font-family: 'SFPixelateBold';
+  font-weight: bold;
+  font-style: normal;
+  font-size: 24px;
+
+  background-color: #73A88C;
+  color: #CEC254;
+}
+
+.left {
+  max-width: 400px;
+  float: left;
+}
+
+.right {
+  margin-left: 400px;
+  max-width: 400px;
+  text-align: center;
+}
+
+h2, #top10 {
+  color: #564148;
+  margin-bottom: 10px;
+}
+
+li:nth-child(1) strong,
+li:nth-child(2) strong,
+li:nth-child(3) strong {
+  font-size: 1.5em;
+}
+
+li strong {
+  font-size: 1.2em;
+}
+
+input#gamer {
+  background: none;
+  border: none;
+  border-bottom: solid 2px #FFF;
+  font-family: "SFPixelateBold";
+  font-size: 35px;
+  color: #FFF;
+  width: 380px;
+}
