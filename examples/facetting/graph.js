@@ -31,8 +31,8 @@
     })
     .then(function (resp) {
         var colors = ['#ff7f0e', '#d62728', '#2ca02c', '#1f77b4'];
-        donutChart("#browser-chart", resp.aggregations.browser.buckets, colors);
-        donutChart("#system-chart", resp.aggregations.system.buckets, colors);
+        donutChart(".chart--browser", resp.aggregations.browser.buckets, colors);
+        donutChart(".chart--system", resp.aggregations.system.buckets, colors);
     });
 
 

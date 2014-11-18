@@ -9,3 +9,7 @@ body {
     stroke: #050505;
     stroke-width: 1px;
 }
+
+.chart {
+    display: inline-block;
+}
