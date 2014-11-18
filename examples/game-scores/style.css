@@ -24,9 +24,7 @@ h2, #top10 {
   margin-bottom: 10px;
 }
 
-li:nth-child(1) strong,
-li:nth-child(2) strong,
-li:nth-child(3) strong {
+li:nth-child(-n+3) strong {
   font-size: 1.5em;
 }
 
