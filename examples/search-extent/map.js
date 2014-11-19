@@ -3,6 +3,10 @@
   var server = 'https://daybed.io';
   var model = 'daybed:examples:search:extent';
 
+  // Anonymous session
+  var _session = new Daybed.Session(server);
+
+
   // Minimalistic React component
   // showing records within map extent
   var ResultsList = React.createClass({
@@ -45,36 +49,23 @@
     React.createElement(ResultsList, {map: map}),
     document.getElementById('results'));
 
-  // Show all records on map
-  loadGeoJson()
+  // Show all records on map, using GeoJSON
+  _session.getRecords(model, {
+      format: 'application/vnd.geo+json',
+    })
     .then(function (geojson) {
-      L.geoJson(geojson, {
+      var options = {
         pointToLayer: function(featureData, latlng) {
-          return L.circle(latlng, 30, {
+          return L.circleMarker(latlng, {
             color: 'purple',
-            fillOpacity: 1.0
-          });
+            fillOpacity: 0.7
+          }).setRadius(4);
         }
-      }).addTo(map);
+      };
+
+      L.geoJson(geojson, options).addTo(map);
     });
 
-
-  // Re-usable session Promise
-  var _session;
-  function getSession() {
-    _session = _session || Daybed.startSession(server, {anonymous: true});
-    return _session;
-  }
-
-  // Helper to fetch records as GeoJSON
-  function loadGeoJson() {
-    return getSession()
-      .then(function (session) {
-        return session.getRecords(model, {
-          format: 'application/vnd.geo+json',
-        });
-      });
-  }
 
   // Helper to run ElasticSearch query on Leaflet LatLngBounds object
   function searchExtent(bbox) {
@@ -99,10 +90,7 @@
       }
     };
 
-    return getSession()
-      .then(function (session) {
-        return session.searchRecords(model, query);
-      })
+    return _session.searchRecords(model, query)
       .then(function (response) {
         // Flatten records from query results
         return response.hits.hits.map(function (r) {
