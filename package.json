@@ -10,8 +10,10 @@
     "url": "git@github.com:spiral-project/daybed.js.git"
   },
   "scripts": {
+    "deploy": "gulp deploy",
+    "dist": "gulp dist",
     "test": "make test",
-    "dist": "gulp dist"
+    "outdated": "npm outdated --depth 0"
   },
   "dependencies": {
     "hawk": "2.2.*",
@@ -20,13 +22,14 @@
     "gulp-gh-pages": "^0.3.*",
     "gulp-uglify": "^0.3.*",
     "browserify": "^4.1.*",
-    "vinyl-source-stream": "^0.1.*"
+    "vinyl-source-stream": "^0.1.*",
+    "promise-polyfill": "1.1.*",
+    "xmlhttprequest": "^1.6.*"
   },
   "devDependencies": {
     "mocha": "1.21.*",
     "chai": "1.9.*",
     "sinon": "1.10.*",
-    "mocha-phantomjs": "3.5.*",
-    "promise-polyfill": "1.1.*"
+    "mocha-phantomjs": "3.5.*"
   }
 }

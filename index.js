@@ -1,5 +1,11 @@
 "use strict";
 
+var isNode = (typeof process !== 'undefined' && process.title === 'node');
+if (isNode) {
+    global.XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+}
+
+var Promise = require('promise-polyfill');
 var utils = require('./ext/utils.js');
 var console = require("console");
 var hawk = require('hawk');
@@ -24,8 +30,8 @@ function request(options) {
     var req = new XMLHttpRequest();
     options.url = options.host + '/v1' + options.url;
     req.open(options.method, options.url, true);
-    req.setRequestHeader('Content-Type', 'application/json');
-    req.setRequestHeader('Accept', 'application/json');
+    req.setRequestHeader('Content-Type', options.format || 'application/json');
+    req.setRequestHeader('Accept', options.format || 'application/json');
     req.responseType = 'json';
     req.timeout = TIMEOUT;
 
@@ -97,7 +103,7 @@ function _credentials(hawkinfo) {
   var token = typeof(hawkinfo.token) == 'function' ? hawkinfo.token()
                                                    : hawkinfo.token;
 
-  // Derive credentials with hdfk
+  // Derive credentials with hkdf
   if (!credentials && token) {
     deriveHawkCredentials(token, 'sessionToken', 32*2, function (creds) {
       credentials = creds;
@@ -237,12 +243,6 @@ Session.prototype = {
     });
   },
 
-  loadModel: function(modelId) {
-    modelId = this._prefixed(modelId);
-    var model = new Model({id: modelId, session: this});
-    return model.load();
-  },
-
   saveModel: function(modelId, model) {
     var url, method;
 
@@ -328,7 +328,9 @@ Session.prototype = {
     });
   },
 
-  getRecords: function(modelId) {
+  getRecords: function(modelId, options) {
+    options = options || {};
+
     if (modelId.constructor == Array) {
       return this._getMultiRecords(modelId);
     }
@@ -337,7 +339,18 @@ Session.prototype = {
       method: "GET",
       host: this.host,
       url: "/models/" + this._prefixed(modelId) + "/records",
-      credentials: this.credentials
+      credentials: this.credentials,
+      format: options.format
+    });
+  },
+
+  searchRecords: function(modelId, query) {
+    return request({
+      method: "POST",
+      host: this.host,
+      url: "/models/" + this._prefixed(modelId) + "/search/",
+      credentials: this.credentials,
+      body: query
     });
   },
 
@@ -506,75 +519,13 @@ Session.prototype = {
 };
 
 
-function Model(options) {
-  options = options || {};
-  this.id = options.id;
-  this.session = options.session;
-
-  this._definition = options.definition;
-  this._records = options.records || [];
-}
-
-Model.prototype = {
-
-  add: function(record) {
-    this._records.push(record);
-  },
-
-  definition: function() {
-    return this._definition;
-  },
-
-  records: function() {
-    return this._records;
-  },
-
-  load: function(options) {
-    var self = this;
-    options = options || {};
-    self.session = options.session || self.session;
-    self.id = options.id || self.id;
-
-    return self.session.getModel(self.id)
-      .then(function (resp) {
-        self._definition = resp.definition;
-        self._records = resp.records;
-        return self;
-      });
-  },
-
-  save: function(options) {
-    options = options || {};
-    this.session = options.session || this.session;
-    var modelId = options.id || this.id;
-
-    var model = {definition: this._definition, records: this._records};
-
-    var self = this;
-    return this.session.saveModel(modelId, model)
-      .then(function(resp) {
-        self.id = resp.id;
-        return self;
-      });
-  },
-
-  delete: function(options) {
-    options = options || {};
-    this.session = options.session || this.session;
-    return this.session.deleteModel(this.id);
-  }
-};
-
-
 var Daybed = {
   getToken: getToken,
   hello: hello,
   fields: fields,
   startSession: startSession,
   spore: spore,
-  Session: Session,
-  Model: Model
+  Session: Session
 };
 
-window.Daybed = Daybed;
 module.exports = Daybed;

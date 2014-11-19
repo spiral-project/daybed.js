@@ -1,0 +1,15 @@
+body {
+    font: 14px sans-serif;
+    font-weight: bold;
+    background-color: black;
+    color: white;
+}
+
+.arc path {
+    stroke: #050505;
+    stroke-width: 1px;
+}
+
+.chart {
+    display: inline-block;
+}

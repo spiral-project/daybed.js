@@ -1,6 +1,3 @@
-var assert = chai.assert;
-
-
 describe('Daybed.startSession', function() {
 
     var server;
@@ -148,19 +145,6 @@ describe('Daybed.Session', function() {
     });
 
 
-    describe('Load models', function() {
-
-        it("should fetch single model from server", function (done) {
-            server.respondWith("GET", "/v1/models/test", '{ "definition": { "title": "Test" } }');
-
-            session.loadModel('test').then(function (model) {
-                assert.equal(model.definition().title, 'Test');
-                done();
-            });
-        });
-    });
-
-
     describe('Prefixed models', function() {
 
         before(function () {
@@ -174,8 +158,8 @@ describe('Daybed.Session', function() {
         it("should prefix automatically model ids", function (done) {
             server.respondWith("GET", "/v1/models/app:test", '{ "definition": { "title": "Test" } }');
 
-            session.loadModel('test').then(function (model) {
-                assert.equal(model.definition().title, 'Test');
+            session.getModel('test').then(function (model) {
+                assert.equal(model.definition.title, 'Test');
                 done();
             });
         });
@@ -183,8 +167,8 @@ describe('Daybed.Session', function() {
         it("should not add prefix if model id is already prefixed", function (done) {
             server.respondWith("GET", "/v1/models/app:test", '{ "definition": { "title": "Test" } }');
 
-            session.loadModel('app:test').then(function (model) {
-                assert.equal(model.definition().title, 'Test');
+            session.getModel('app:test').then(function (model) {
+                assert.equal(model.definition.title, 'Test');
                 done();
             });
         });
@@ -239,6 +223,18 @@ describe('Daybed.Session', function() {
                     'app:mod1': { "records": [ {"id": 3} ] },
                     'app:mod2': { "records": [ {"id": 4} ] },
                 });
+                done();
+            });
+        });
+
+        it("should send accept format header if specified", function (done) {
+            server.respondWith("GET", "/v1/models/app:test/records", '{ "records": [ {"id": 1} ] }');
+
+            session.getRecords('app:test', {format: 'application/csv'})
+            .then(function (response) {
+                var headers = server.requests[0].requestHeaders;
+                assert.equal(headers['Accept'], 'application/csv');
+                assert.equal(headers['Content-Type'], 'application/csv');
                 done();
             });
         });
@@ -339,6 +335,21 @@ describe('Daybed.Session', function() {
                 assert.deepEqual(response, { "records": [] });
                 done();
             });
+        });
+    });
+
+
+    describe('Search records', function() {
+
+        it("should post the specified query", function (done) {
+            server.respondWith("POST", "/v1/models/test/search/", '{ "hits": [] }');
+
+            session.searchRecords('test', {filtered: "query"})
+              .then(function (model) {
+                var request = server.requests[0];
+                assert.equal(request.requestBody, '{\"filtered\":\"query\"}');
+                done();
+              });
         });
     });
 

@@ -13,6 +13,9 @@ serve:
 dist:
 	npm run dist
 
+deploy:
+	npm run deploy
+
 test: install dist
 	@./node_modules/mocha-phantomjs/bin/mocha-phantomjs test/index.html
 

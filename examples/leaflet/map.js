@@ -11,6 +11,7 @@
   });
 
 
+  // Anonymous session
   var _session = new Daybed.Session(server);
   _session.getRecords(model)
     .then(function (response) {

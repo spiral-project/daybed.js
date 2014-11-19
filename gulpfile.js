@@ -10,25 +10,33 @@ var deploy = require("gulp-gh-pages");
 
 var opt = {
   outputFolder: "build",
-
   app: {
-    src: ["./index.js", "./ext/utils.js", "./ext/hkdf.js"],
+    src: "./index.js",
     dest: "daybed.js"
   },
+  bundle: {
+    standalone: 'Daybed'
+  }
 };
 
 
 gulp.task("dist", function() {
   return browserify(opt.app.src)
-    .bundle()
+    .ignore('xmlhttprequest')
+    .bundle(opt.bundle)
     .pipe(source(opt.app.dest))
+    .pipe(gulp.dest(opt.outputFolder));
+});
+
+gulp.task("cname", function() {
+  return gulp.src("CNAME")
     .pipe(gulp.dest(opt.outputFolder));
 });
 
 /**
  * Deploy to gh-pages
  */
-gulp.task("deploy", ["dist"], function() {
+gulp.task("deploy", ["dist", "cname"], function() {
   gulp.src("./build/**")
       .pipe(deploy("git@github.com:spiral-project/daybed.js.git"));
 });
