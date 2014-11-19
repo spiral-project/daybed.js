@@ -243,12 +243,6 @@ Session.prototype = {
     });
   },
 
-  loadModel: function(modelId) {
-    modelId = this._prefixed(modelId);
-    var model = new Model({id: modelId, session: this});
-    return model.load();
-  },
-
   saveModel: function(modelId, model) {
     var url, method;
 
@@ -525,74 +519,13 @@ Session.prototype = {
 };
 
 
-function Model(options) {
-  options = options || {};
-  this.id = options.id;
-  this.session = options.session;
-
-  this._definition = options.definition;
-  this._records = options.records || [];
-}
-
-Model.prototype = {
-
-  add: function(record) {
-    this._records.push(record);
-  },
-
-  definition: function() {
-    return this._definition;
-  },
-
-  records: function() {
-    return this._records;
-  },
-
-  load: function(options) {
-    var self = this;
-    options = options || {};
-    self.session = options.session || self.session;
-    self.id = options.id || self.id;
-
-    return self.session.getModel(self.id)
-      .then(function (resp) {
-        self._definition = resp.definition;
-        self._records = resp.records;
-        return self;
-      });
-  },
-
-  save: function(options) {
-    options = options || {};
-    this.session = options.session || this.session;
-    var modelId = options.id || this.id;
-
-    var model = {definition: this._definition, records: this._records};
-
-    var self = this;
-    return this.session.saveModel(modelId, model)
-      .then(function(resp) {
-        self.id = resp.id;
-        return self;
-      });
-  },
-
-  delete: function(options) {
-    options = options || {};
-    this.session = options.session || this.session;
-    return this.session.deleteModel(this.id);
-  }
-};
-
-
 var Daybed = {
   getToken: getToken,
   hello: hello,
   fields: fields,
   startSession: startSession,
   spore: spore,
-  Session: Session,
-  Model: Model
+  Session: Session
 };
 
 module.exports = Daybed;
