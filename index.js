@@ -35,6 +35,12 @@ function request(options) {
     req.responseType = 'json';
     req.timeout = TIMEOUT;
 
+    if (options.headers) {
+      Object.keys(options.headers).forEach(function(header) {
+        req.setRequestHeader(header, options.headers[header]);
+      });
+    }
+
     if (options.validateOnly) {
       req.setRequestHeader('Validate-Only', 'true');
     }
@@ -70,6 +76,7 @@ function request(options) {
         return;
       }
 
+      response.req = req;
       // Success
       resolve(response);
     };
@@ -91,6 +98,8 @@ function request(options) {
     req.send(body);
   });
 }
+
+var fxaOAuth = require('./fxa-oauth')(request);
 
 function _credentials(hawkinfo) {
   hawkinfo = hawkinfo || {
@@ -525,7 +534,8 @@ var Daybed = {
   fields: fields,
   startSession: startSession,
   spore: spore,
-  Session: Session
+  Session: Session,
+  fxaOAuth: fxaOAuth
 };
 
 module.exports = Daybed;
