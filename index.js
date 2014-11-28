@@ -448,6 +448,26 @@ Session.prototype = {
     });
   },
 
+  addRecordAuthor: function(modelId, recordId, authorHawkId) {
+    return request({
+      method: "PATCH",
+      host: this.host,
+      url: "/models/" + this._prefixed(modelId) + "/records/" + recordId + "/authors",
+      credentials: this.credentials,
+      body: [authorHawkId]
+    });
+  },
+
+  removeRecordAuthor: function(modelId, recordId, authorHawkId) {
+    return request({
+      method: "PATCH",
+      host: this.host,
+      url: "/models/" + this._prefixed(modelId) + "/records/" + recordId + "/authors",
+      credentials: this.credentials,
+      body: ["-" + authorHawkId]
+    });
+  },
+
   synchronizeRecords: function (modelId, records, options) {
     if (typeof modelId == 'object') {
       return this._synchronizeMultiRecords(modelId);
